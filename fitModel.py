@@ -84,24 +84,6 @@ def breadth_depth(genomeSize,mappingFile,reqIden,reqLength):
 	seqBreadth=sum(genPos.values())/float(genomeSize)
 	seqDepth = wholeDepth/float(genomeSize)
 	return([seqBreadth,seqDepth])	
-#def sigmoid(X):
-#	return 1 / (1 + np.exp(- X))
-#def compute_cost(theta, X, y):
-#	p_1 = sigmoid(np.dot(X, theta)) # Predicted probability of label 1
-#	log_l = (-y)*np.log(p_1) - (1-y)*np.log(1-p_1) # Log-likelihood vector
-#	return log_l.mean()
-#def compute_grad(theta, X, y ):
-#	p_1 = sigmoid(np.dot(X, theta))
-#	error = p_1 - y # difference between label and prediction
-#	grad = np.dot(error, X) / y.size # gradient vector
-#	return grad
-#def decorated_cost(it, y, n):
-#	def f(theta):
-#		return compute_cost(theta, it, y)
-#	def fprime(theta):
-#		return compute_grad(theta, it, y)
-#	theta = np.zeros(n+1)
-#	return opt.fmin_bfgs(f, theta, fprime, disp=True, maxiter=400)
 def sigmoid(z):
     e = np.exp(1)
     den = 1.0 + e ** (-1.0 * z)
