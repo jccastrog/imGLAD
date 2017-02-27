@@ -102,18 +102,20 @@ def breadth_depth(genomeSize,mappingFile,reqIden,reqLength):
 #		return compute_grad(theta, it, y)
 #	theta = np.zeros(n+1)
 #	return opt.fmin_bfgs(f, theta, fprime, disp=True, maxiter=400)
-def sigmoid(X):
+def sigmoid(z):
     e = np.exp(1)
-    den = 1.0 + e ** (-1.0 * X)
+    den = 1.0 + e ** (-1.0 * z)
     d = 1.0 / den
     return d
 def compute_cost(theta, X, y, n):
-    #Number of training samples
     theta.shape = (1, n)
     m = y.size
     h = sigmoid(X.dot(theta.T))
-    J = (1.0 / m) * ((-y.T.dot(np.log(h))) - ((1.0 - y.T).dot(np.log(1.0 - h))))
-    return - 1 * J.sum()
+    t = y*(np.log(h) + (1 - y)*(np.log(1 -h))
+    J = -1/(m*(t.sum()))
+    #J = (1.0 / m) * ((-y.T.dot(np.log(h))) - ((1.0 - y.T).dot(np.log(1.0 - h))))
+    #return -1*J.sum()
+    return J
 def compute_grad(theta, X, y, n):
     theta.shape = (1, n)
     grad = np.zeros(n)
@@ -334,8 +336,9 @@ print m
 print n
 y.shape = (m, 1)
 #=======================6.3 Calculated the parameters=======================
-it = np.ones(shape=(m, n+1))
-it[:, 1:n+1] = X
+iniTheta = np.ones(shape=(m, n+1))
+iniTheta[:, 1:n+1] = X
+costGrad = compute_cost(initial_theta, X, y)
 theta=decorated_cost(it, y, n)
 paramFile = open(paramName, 'w')
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
