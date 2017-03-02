@@ -8,30 +8,35 @@
 @license: artistic license 2.0
 '''
 
-#======================================================1.0 Import modules and initialize variables=========================================================
-#1.1 Import modules
+'''1.0 Import modules, define functions, and initialize variables'''
+#========================1.1 Import modules=========================
 import os, sys, argparse, subprocess, re  #interact with the system, use regular expressions
 from os.path import basename
-import numpy #make calculations base
+import numpy as np #make calculations base
 from Bio import SeqIO #parse and manipulate fasta files
 
-#1.2 Initialize variables
-parser = argparse.ArgumentParser(description="protEstimate.py: Estimation of bacterial genomes in biological samples [jccastrog@gatech.edu] Aplha optimized for E. coli") #EDIT FOR THE ACTUAL NAME
+#=====================1.2 Initialize variables======================
+parser = argparse.ArgumentParser(description="protEstimate.py: Estimation of bacterial genomes in biological samples [jccastrog@gatech.edu] Aplha optimized for E. coli")
 parser.add_argument('-m', action='store', dest='Map', required=True, default='', help='One or more Tabular BLAST files of reads vs genes (or contigs).',nargs='+')
 parser.add_argument('-s', action='store', dest='Seq', required=False, default='', help='Subject sequences (ref) in FastA format.')
+parser.add_argument('-p', action='store', dest='Param', required=False, default=numpy.array([-34.738273,550.229,1080.350]),help="Parameters file obtained from fitModel.py")
+parse.add_argument('-l', action='store', dest='Param', required=False, default='single', choices=["blastn","blat"], 
 args=parser.parse_args() #parse all the arguments into the array "args"
 genomeSize=0 #the genome size
 
-#1.3 Define functions
+#=======================1.3 Define functions========================
+def breadthProb(vars,theta)
+	if len(theta)==3:
+		z = np.array(theta)
+		g = 1/(1 + np.exp(-z)
 def predProb(depth,breadth):
-#	theta=numpy.array([-42.492028,855.165048,403.992113])
-	theta=numpy.array([-48.576425,923.055095,433.755612])
+	theta=numpy.array([-34.738273,550.229,1080.350])
 	z=numpy.dot(numpy.array([1,depth,breadth]),theta)
 	g= 1/(1+numpy.exp(-z))
 	return(g)
 
-#============================================2.0 Load the blast results to calculate sequencing depth and breadth==========================================
-#2.1 Sequencing depth and breadth
+'''2.0 Load the blast results to calculate sequencing depth and breadth'''
+#====================2.1 Sequencing depth and breadth=====================
 #2.1.1 Parse reference
 with open(args.Seq) as fastaFile:
 	for fastaParse in SeqIO.parse(fastaFile,"fasta"):
@@ -64,10 +69,9 @@ for file in args.Map:
 						continue
 					else:
 						genPos[key]=1
-#		print sum(genPos.values())
 #2.2.2 Calculate sequencing depth and breadth
 	seqDepth=wholeDepth/float(genomeSize)
 	seqBreadth=sum(genPos.values())/float(genomeSize)
-#=======================================================3.0 Calculate the probability of presence========================================================
+'''3.0 Calculate the probability of presence'''
 	predict=predProb(seqDepth,seqBreadth)
 	print basename(file)+'\t'+str(seqDepth)+'\t'+str(seqBreadth)+'\t'+str(1-predict)

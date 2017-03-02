@@ -39,8 +39,6 @@ group = parser.add_argument_group('Mapping arguments') #Mapping
 group.add_argument('-p', action='store', dest='prog', required=False, default='blastn', choices=["blastn","blat"], help='Program to be used to align the metagenomes and the reference sequence. (default: %(default)s)')
 group.add_argument('-i', action='store', dest='perc_identity', required=False, default='95', help='Percentage of identity to recruit a read to the genome. (default: %(default)s)')
 group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='100', help='Alingment length to recruit a read to the genome. (default: %(default)s)')
-#group = parser.add_argument_group('Limit arguments')
-#group.add_argument('-dl', action='store', dest=
 args = parser.parse_args() #parse all the arguments into the array "args"
 #1.2.2 Global variables==============================================
 downloadDict=dict()
@@ -94,10 +92,8 @@ def compute_cost(theta, X, y, n):
     m = y.size
     h = sigmoid(X.dot(theta.T))
     t = y*(np.log(h) + (1 - y)*(np.log(1 -h))
-    J = -1/(m*(t.sum()))
-    #J = (1.0 / m) * ((-y.T.dot(np.log(h))) - ((1.0 - y.T).dot(np.log(1.0 - h))))
-    #return -1*J.sum()
-    return J
+    J = (1.0 / m) * ((-y.T.dot(np.log(h))) - ((1.0 - y.T).dot(np.log(1.0 - h))))
+    return -1*J.sum()
 def compute_grad(theta, X, y, n):
     theta.shape = (1, n)
     grad = np.zeros(n)

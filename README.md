@@ -30,4 +30,8 @@ You can also download the zip file from the GitHub site https://github.com/jccas
 
 ## Building models for target genomes
 
-Once you have installed imGLAD you can use fitModel.py(./fitModel.py) to create a model of the target genome you want to detect. 
+Once you have installed imGLAD you can use fitModel.py(./fitModel.py) to create a model of the target genome you want to detect.
+
+## Estimating the probability of precense for your samples
+
+To determine 
