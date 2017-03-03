@@ -2,7 +2,7 @@
 '''
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 10-Aug-2016
+@update: 03-Mar-2017
 @version: 1.0
 @license: artistic license 2.0
 please type "fitModel.py -h" for usage help
@@ -14,14 +14,21 @@ please type "fitModel.py -h" for usage help
 import os, sys, subprocess #Interact with the system
 import argparse #Parse the arguments to the program
 import gzip #Zip and unzip files
-import random #Functions for randomizationi
-import screed #Short reads utils
+import random #Functions for randomization
 import scipy.optimize as opt #Function optimization using scipy
 import numpy as np #Numerical operations in python
 from numpy import loadtxt, where #Load text data
 from Bio import SeqIO #Work with Fasta files
 from Bio.Seq import Seq #Work with sequence data
 from Bio.Blast.Applications import NcbiblastxCommandline #Local BLAST for alignment
+try:
+	import screed #Short reads utils
+except:
+	sys.stderr.write('Module "screed" is missing please install it before running fitModel.py\n')
+try:
+	import statsmodels.discrete.discrete_model as sm
+except:
+	sys.stderr.write('Consider installing python module "statsmodels" for faster calculation of model parameters \n')
 #=====================1.2 Initialize variables======================
 #1.2.1 Parser variables=============================================
 parser = argparse.ArgumentParser(description="fitModel: Using simulated metagenomes built with Grinder estimate the training parameters for detection in a metagenomic dataset [jccastrog@gatech.edu]")
@@ -91,7 +98,6 @@ def compute_cost(theta, X, y, n):
     theta.shape = (1, n)
     m = y.size
     h = sigmoid(X.dot(theta.T))
-    t = y*(np.log(h) + (1 - y)*(np.log(1 -h))
     J = (1.0 / m) * ((-y.T.dot(np.log(h))) - ((1.0 - y.T).dot(np.log(1.0 - h))))
     return -1*J.sum()
 def compute_grad(theta, X, y, n):
@@ -310,14 +316,21 @@ y = data[:, 2]
 pos = where(y == 1)
 neg = where(y == 0)
 m, n = X.shape
-print m
-print n
 y.shape = (m, 1)
+it = np.ones(shape=(m, n+1))
+it[:, 1:n+1] = X
 #=======================6.3 Calculated the parameters=======================
-iniTheta = np.ones(shape=(m, n+1))
-iniTheta[:, 1:n+1] = X
-costGrad = compute_cost(initial_theta, X, y)
-theta=decorated_cost(it, y, n)
+try:
+	logit = sm.Logit(y, it)
+	theta = logit.fit().params
+except:
+	iniTheta = np.ones(shape=(m, n+1))
+	iniTheta[:, 1:n+1] = X
+	costGrad = compute_cost(initial_theta, X, y)
+	theta=decorated_cost(it, y, n)
 paramFile = open(paramName, 'w')
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
+os.system("rm "+trainName)
 paramFile.close()
+sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
+#===========================================================================
