@@ -67,26 +67,26 @@ def get_genome_size(genomeFile):
 			genomeSize = genomeSize+len(seq)
 	return(genomeSize)
 def breadth_depth(genomeSize,mappingFile,reqIden,reqLength):
-	wholeDepth=0 #The depth of the overall genome
-	genPos=dict() #Position directory
+	wholeDepth = 0 #The depth of the overall genome
+	genPos = dict() #Position directory
 	with open(mappingFile) as mapping: #Open Mapping file
 		lines = mapping.readlines() #Read the file line by line
 		for line in lines: #For each line
-			line=line.rstrip('\n') #Chomp
-                        fields=line.split('\t') #Split the fields of the blast file
-                        alnLength=int(fields[3]) #The alignment length
-                        perIden=float(fields[2]) #The percentage of identity
+			line.rstrip('\n') #Chomp
+                        fields = line.split('\t') #Split the fields of the blast file
+                        alnLength = int(fields[3]) #The alignment length
+                        perIden = float(fields[2]) #The percentage of identity
                         if alnLength>=reqLength and perIden>=reqIden:
-				subSta=int(fields[8]) #The subject start of the alignment
-				subEnd=int(fields[9]) #The subject end of the alignment
-				wholeDepth=wholeDepth+alnLength
-				keys= range(subSta,subEnd+1) #Create an arrray of the coordinates being mapped
+				subSta = int(fields[8]) #The subject start of the alignment
+				subEnd = int(fields[9]) #The subject end of the alignment
+				wholeDepth = wholeDepth+alnLength
+				keys = range(subSta,subEnd+1) #Create an arrray of the coordinates being mapped
 				for key in keys: #For each of the positions ask if it is in the position directory or not
 					if key in genPos:
 						continue
 					else:
-						genPos[key]=1
-	seqBreadth=sum(genPos.values())/float(genomeSize)
+						genPos[key] = 1
+	seqBreadth = sum(genPos.values())/float(genomeSize)
 	seqDepth = wholeDepth/float(genomeSize)
 	return([seqBreadth,seqDepth])	
 def sigmoid(z):
@@ -300,9 +300,9 @@ for filename in os.listdir("_tempaln/"): #For each alignment file
 		targetPresent = 1
 	elif filename.startswith("simulatedNeg"): #If the set is negative
 		targetPresent = 0
-	trainArr = breadth_depth(genomeSize , "_tempaln/"+filename, int(args.perc_identity), int(args.aln_length)) #Calcuate sequencin depth and breadth
+	trainArr = breadth_depth(genomeSize , "_tempaln/"+filename, int(args.perc_identity), int(args.aln_length)) #Calcuate sequencing depth and breadth
 	trainArr.append(targetPresent) #Append the value of presence
-	trainStr=str(trainArr[0])+","+str(trainArr[1])+","+str(trainArr[2])+"\n" #A stirng with the comma separated values
+	trainStr = str(trainArr[0])+","+str(trainArr[1])+","+str(trainArr[2])+"\n" #A string with the comma separated values
 	trainFile.write(trainStr) #Write the results as a csv
 trainFile.close()
 
@@ -317,9 +317,11 @@ pos = where(y == 1)
 neg = where(y == 0)
 m, n = X.shape
 y.shape = (m, 1)
+#=======================6.3 Calculate the parameters========================
+paramFile = open(paramName, 'w')
+#6.3.1Calculate based on sequencing breadth only============================
 it = np.ones(shape=(m, n+1))
 it[:, 1:n+1] = X
-#=======================6.3 Calculated the parameters=======================
 try:
 	logit = sm.Logit(y, it)
 	theta = logit.fit().params
@@ -328,7 +330,18 @@ except:
 	iniTheta[:, 1:n+1] = X
 	costGrad = compute_cost(initial_theta, X, y)
 	theta=decorated_cost(it, y, n)
-paramFile = open(paramName, 'w')
+paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
+#6.3.2 Calculate based on sequencing breadth aand depth=====================
+it = np.ones(shape=(m, n))
+it[:, 1:n+1] = X[:,0]
+try:
+	        logit = sm.Logit(y, it)
+		        theta = logit.fit().params
+except:
+	        iniTheta = np.ones(shape=(m, n+1))
+		        iniTheta[:, 1:n+1] = X
+			        costGrad = compute_cost(initial_theta, X, y)
+				        theta=decorated_cost(it, y, n)
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
 os.system("rm "+trainName)
 paramFile.close()
