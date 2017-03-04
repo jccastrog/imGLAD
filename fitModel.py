@@ -3,7 +3,7 @@
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
 @update: 03-Mar-2017
-@version: 1.0
+@version: 1.0.4
 @license: GNU General Public License v3.0.
 please type "./fitModel.py -h" for usage help
 '''
@@ -11,18 +11,18 @@ please type "./fitModel.py -h" for usage help
 
 '''1.0 Import modules, define functions, and initialize variables'''
 #========================1.1 Import modules=========================
-import os, sys, subprocess #Interact with the system
-import argparse #Parse the arguments to the program
-import gzip #Zip and unzip files
-import random #Functions for randomization
-import scipy.optimize as opt #Function optimization using scipy
-import numpy as np #Numerical operations in python
-from numpy import loadtxt, where #Load text data
-from Bio import SeqIO #Work with Fasta files
-from Bio.Seq import Seq #Work with sequence data
-from Bio.Blast.Applications import NcbiblastxCommandline #Local BLAST for alignment
+import os, sys, subprocess 
+import argparse 
+import gzip 
+import random 
+import scipy.optimize as opt 
+import numpy as np 
+from numpy import loadtxt, where 
+from Bio import SeqIO 
+from Bio.Seq import Seq 
+from Bio.Blast.Applications import NcbiblastxCommandline 
 try:
-	import screed #Short reads utils
+	import screed 
 except:
 	sys.stderr.write('Module "screed" is missing please install it before running fitModel.py\n')
 try:
@@ -32,21 +32,21 @@ except:
 #=====================1.2 Initialize variables======================
 #1.2.1 Parser variables=============================================
 parser = argparse.ArgumentParser(description="fitModel: Using simulated metagenomes built with Grinder estimate the training parameters for detection in a metagenomic dataset [jccastrog@gatech.edu]")
-group = parser.add_argument_group('Required arguments') #Required
+group = parser.add_argument_group('Required arguments') 
 group.add_argument('-t', action='store', dest='target', required=True, help='The target genome to be detected in FASTA format.')
 group.add_argument('-sp', action='store', dest='sp', required=True, help = 'The species of the genome written as binomial name in quotations. (e.g. "Escherichia coli")')
-group = parser.add_argument_group('Simulated datasets arguments') #Simulated datasets
+group = parser.add_argument_group('Simulated datasets arguments') 
 group.add_argument('-l', action='store', dest='genomes', required=False, help='The genomes list to create the training dataset')
 group.add_argument('-s', action='store', dest='train_size', required=False, default=200, help='Size of the training dataset in number of genomes (Incompatible with -l). (default : %(default)s)')
 group.add_argument('-e', action='store', dest='training_examples', required=False, default=100, help='Number of training examples (metagenomic datasets) used to train the model by default 200 (100 positive and 100 negative examples. (default : %(default)s)')
 group.add_argument('-j', action='store', dest='platform', required=False, default='illumina', help='The sequencing platform used to generate the reads in the datasets. (default : %(default)s)')
 group.add_argument('-r', action='store', dest='num_reads', required=False, default=1000000, help='Number of reads per training example (Metagenomic dataset simulated). (default : %(default)s)')
 group.add_argument('-d', action='store', dest='read_length', required=False, default=150, help='Average read length for the simulated datasets. (default : %(default)s)')
-group = parser.add_argument_group('Mapping arguments') #Mapping
+group = parser.add_argument_group('Mapping arguments') 
 group.add_argument('-p', action='store', dest='prog', required=False, default='blastn', choices=["blastn","blat"], help='Program to be used to align the metagenomes and the reference sequence. (default: %(default)s)')
 group.add_argument('-i', action='store', dest='perc_identity', required=False, default='95', help='Percentage of identity to recruit a read to the genome. (default: %(default)s)')
 group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='100', help='Alingment length to recruit a read to the genome. (default: %(default)s)')
-args = parser.parse_args() #parse all the arguments into the array "args"
+args = parser.parse_args() 
 #1.2.2 Global variables==============================================
 downloadDict=dict()
 trainName = 'trainingValues.csv'
@@ -67,21 +67,21 @@ def get_genome_size(genomeFile):
 			genomeSize = genomeSize+len(seq)
 	return(genomeSize)
 def breadth_depth(genomeSize,mappingFile,reqIden,reqLength):
-	wholeDepth = 0 #The depth of the overall genome
-	genPos = dict() #Position directory
-	with open(mappingFile) as mapping: #Open Mapping file
-		lines = mapping.readlines() #Read the file line by line
-		for line in lines: #For each line
-			line.rstrip('\n') #Chomp
-                        fields = line.split('\t') #Split the fields of the blast file
-                        alnLength = int(fields[3]) #The alignment length
-                        perIden = float(fields[2]) #The percentage of identity
+	wholeDepth = 0 
+	genPos = dict() 
+	with open(mappingFile) as mapping:
+		lines = mapping.readlines()
+		for line in lines:
+			line.rstrip('\n') 
+                        fields = line.split('\t')
+                        alnLength = int(fields[3])
+                        perIden = float(fields[2])
                         if alnLength>=reqLength and perIden>=reqIden:
-				subSta = int(fields[8]) #The subject start of the alignment
-				subEnd = int(fields[9]) #The subject end of the alignment
+				subSta = int(fields[8])
+				subEnd = int(fields[9])
 				wholeDepth = wholeDepth+alnLength
-				keys = range(subSta,subEnd+1) #Create an arrray of the coordinates being mapped
-				for key in keys: #For each of the positions ask if it is in the position directory or not
+				keys = range(subSta,subEnd+1)
+				for key in keys:
 					if key in genPos:
 						continue
 					else:
@@ -121,26 +121,26 @@ def decorated_cost(it, y, n):
 
 '''2.0 Download the gneomes from NCBI'''
 #======2.1 Initialize the download======
-if not os.path.exists("_tempdir"): #Create a temporary directory for the genomes and datasets
+if not os.path.exists("_tempdir"):
 	os.makedirs("_tempdir") 
-os.system("curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/assembly_summary.txt -o _tempdir/genomes.txt --silent") #Download the assembly_summary.txt from NCBI
-os.system("awk -F '\t' -v OFS='\t' '{if($12==\"Complete Genome\") print $8, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt") #Filter the complete genomes and get their URLs
-os.remove('_tempdir/genomes.txt') #Remove the full genomes file
-summFile='_tempdir/assembly_summary_complete_genomes.txt' #The summary file with the names and URL of the genomes
+os.system("curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/assembly_summary.txt -o _tempdir/genomes.txt --silent")
+os.system("awk -F '\t' -v OFS='\t' '{if($12==\"Complete Genome\") print $8, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt")
+os.remove('_tempdir/genomes.txt')
+summFile='_tempdir/assembly_summary_complete_genomes.txt'
 #=======2.2 Download the genomes========
 sys.stderr.write('Downloading the training genomes from NCBI...\n')
 genomesFile = open('_tempdir/genomes.fna', 'w')
 #2.2.1 Download the list genomes========
-if args.genomes is not None: #Is a list is provided
-	if args.train_size is not None: #If the size is also specified
-		sys.stderr.write('Error! Argument -s ignored when using -l\n') #Output anr error message
-	genomes = [line.rstrip('\n') for line in open(args.genomes)] #Create a list with the genome names
-	with open(summFile) as summary: #With the summary file
-		lines = summary.readlines() #Read through the file
-		refFile = open(refName, 'w') #The file with the reference files names
-		for line in lines: #For each line in the summary file
-			line = line.rstrip('\n') #Chomp
-			fields = line.split('\t') #Split the fields by tabs
+if args.genomes is not None:
+	if args.train_size is not None:
+		sys.stderr.write('Error! Argument -s ignored when using -l\n')
+	genomes = [line.rstrip('\n') for line in open(args.genomes)]
+	with open(summFile) as summary:
+		lines = summary.readlines()
+		refFile = open(refName, 'w')
+		for line in lines:
+			line = line.rstrip('\n')
+			fields = line.split('\t')
 			if fields[0] in genomes: #If the genome name is in the list
 				fileName = fields[1].split('/')[-1] #Split the URL by '/'
 				fileName = fields[1]+'/'+fileName+'_genomic.fna.gz' #Add the file name and extension to be downloaded
@@ -336,12 +336,12 @@ it = np.ones(shape=(m, n))
 it[:, 1:n+1] = X[:,0]
 try:
 	        logit = sm.Logit(y, it)
-		        theta = logit.fit().params
+		theta = logit.fit().params
 except:
 	        iniTheta = np.ones(shape=(m, n+1))
-		        iniTheta[:, 1:n+1] = X
-			        costGrad = compute_cost(initial_theta, X, y)
-				        theta=decorated_cost(it, y, n)
+		iniTheta[:, 1:n+1] = X
+		costGrad = compute_cost(initial_theta, X, y)
+		theta=decorated_cost(it, y, n)
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
 os.system("rm "+trainName)
 paramFile.close()

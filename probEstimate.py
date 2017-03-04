@@ -4,7 +4,7 @@
 @name: probEstimate.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
 @update: 21-Apr-2016
-@version: 1.0
+@version: 1.0.4
 @license: GNU General Public License v3.0.
 please type "./protEstimate.py -h" for usage help
 '''
