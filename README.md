@@ -1,7 +1,7 @@
 # imGLAD
 
 imGLAD is a computational tool for detection of bacterial genomes in metagenomic datasets. For license information, see
-[LICENSE.txt](./LICENSE.txt).
+[LICENSE](./LICENSE).
 
 ## Overview
 
