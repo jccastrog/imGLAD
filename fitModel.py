@@ -4,8 +4,8 @@
 @author: Juan C. Castro <jccastrog at gatech dot edu>
 @update: 03-Mar-2017
 @version: 1.0
-@license: artistic license 2.0
-please type "fitModel.py -h" for usage help
+@license: GNU General Public License v3.0.
+please type "./fitModel.py -h" for usage help
 '''
 
 
