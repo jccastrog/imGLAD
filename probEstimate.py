@@ -19,9 +19,9 @@ from Bio import SeqIO #parse and manipulate fasta files
 #=====================1.2 Initialize variables======================
 parser = argparse.ArgumentParser(description="protEstimate.py: Estimation of bacterial genomes in biological samples [jccastrog@gatech.edu]")
 group = parser.add_argument_group('Required arguments') #Required
+parser.add_argument('-t', action='store', dest='target', required=True, default='', help='Subject sequences (ref) in FastA format.')
 group.add_argument('-m', action='store', dest='map', required=True, default='', help='One or more Tabular BLAST files of reads vs genes (or contigs).',nargs='+')
-parser.add_argument('-s', action='store', dest='seq', required=True, default='', help='Subject sequences (ref) in FastA format.')
-roup = parser.add_argument_group('Optional arguments') #Required
+group = parser.add_argument_group('Optional arguments') #Required
 group.add_argument('-p', action='store', dest='param', required=False, default=[-34.738273,550.229,1080.350],help="Parameters file obtained from fitModel.py")
 group.add_argument('-l', action='store', dest='mode', required=False, default='single', choices=["single","general"],help='Number of parameters to be used to estimate the prescence probability: single mode will use only sequencing breadth whereas general mode will use sequencing depth and seuqencing breadth. (default : %(default)s)')
 args=parser.parse_args() #parse all the arguments into the array "args"
@@ -43,7 +43,7 @@ def predProb(vars,theta):
 '''2.0 Load the blast results to calculate sequencing depth and breadth'''
 #====================2.1 Sequencing depth and breadth=====================
 #2.1.1 Parse reference====================================================
-with open(args.seq) as fastaFile:
+with open(args.target) as fastaFile:
 	for fastaParse in SeqIO.parse(fastaFile,"fasta"):
 		ID=fastaParse.id
                 seq=fastaParse.seq
