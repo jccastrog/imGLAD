@@ -18,13 +18,18 @@ import random
 import scipy.optimize as opt 
 import numpy as np 
 from numpy import loadtxt, where 
-from Bio import SeqIO 
-from Bio.Seq import Seq 
-from Bio.Blast.Applications import NcbiblastxCommandline 
+try :
+	from Bio import SeqIO
+	from Bio.Seq import Seq
+	from Bio.Blast.Applications import NcbiblastxCommandline
+except:
+	sys.stderr.write('Module BioPython (Bio) is missing please install it before running fitModel.py\n')
+	sys.exit()
 try:
 	import screed 
 except:
 	sys.stderr.write('Module "screed" is missing please install it before running fitModel.py\n')
+	sys.exit()
 try:
 	import statsmodels.discrete.discrete_model as sm
 except:
@@ -43,7 +48,7 @@ group.add_argument('-j', action='store', dest='platform', required=False, defaul
 group.add_argument('-r', action='store', dest='num_reads', required=False, default=1000000, help='Number of reads per training example (Metagenomic dataset simulated). (default : %(default)s)')
 group.add_argument('-d', action='store', dest='read_length', required=False, default=150, help='Average read length for the simulated datasets. (default : %(default)s)')
 group = parser.add_argument_group('Mapping arguments') 
-group.add_argument('-p', action='store', dest='prog', required=False, default='blastn', choices=["blastn","blat"], help='Program to be used to align the metagenomes and the reference sequence. (default: %(default)s)')
+group.add_argument('-p', action='store', dest='prog', required=False, default='blat', choices=["blat","blastn"], help='Program to be used to align the metagenomes and the reference sequence. (default: %(default)s)')
 group.add_argument('-i', action='store', dest='perc_identity', required=False, default='95', help='Percentage of identity to recruit a read to the genome. (default: %(default)s)')
 group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='100', help='Alingment length to recruit a read to the genome. (default: %(default)s)')
 args = parser.parse_args() 
@@ -141,95 +146,95 @@ if args.genomes is not None:
 		for line in lines:
 			line = line.rstrip('\n')
 			fields = line.split('\t')
-			if fields[0] in genomes: #If the genome name is in the list
-				fileName = fields[1].split('/')[-1] #Split the URL by '/'
-				fileName = fields[1]+'/'+fileName+'_genomic.fna.gz' #Add the file name and extension to be downloaded
-				outName = "_tempdir/"+"_".join(fields[0].split(' '))+".fna.gz" #The output name
-				refFile.write(outName+'\n') #Write the file name into the reference files file
-				subprocess.call(["curl", fileName, "-o", outName, "--silent"]) #Download the genome
-				fastaName = outName.rstrip('.gz') #The name of the fasta file
-				zipRef = zip.open(outName, 'rb') #Unzip the file just downloaded
-				fastaFile = open(fastaName, 'wb') #The destination fasta
+			if fields[0] in genomes:
+				fileName = fields[1].split('/')[-1]
+				fileName = fields[1]+'/'+fileName+'_genomic.fna.gz'
+				outName = "_tempdir/"+"_".join(fields[0].split(' '))+".fna.gz"
+				refFile.write(outName+'\n')
+				subprocess.call(["curl", fileName, "-o", outName, "--silent"])
+				fastaName = outName.rstrip('.gz')
+				zipRef = zip.open(outName, 'rb')
+				fastaFile = open(fastaName, 'wb')
 				fastaFile.write( zipRef.read() )
 				zipRef.close()
 				fastaFile.close()
-				os.remove(outName) #Remove the files
-				with open(outName.rstrip('.gz')) as inFile: #Add the genome to genomes.fna
+				os.remove(outName)
+				with open(outName.rstrip('.gz')) as inFile:
 					for line in inFile:
 				                genomesFile.write(line)
 				os.remove(fastaName)
-			os.remove("_tempdir/assembly_summary_complete_genomes.txt") #Remove the summary file
+			os.remove("_tempdir/assembly_summary_complete_genomes.txt")
 		refFile.close()
 #2.2.2 Download the default genomes=====
 else:
-	with open(summFile) as summary: #With the summary file
-		lines = random.sample(summary.readlines(),int(int(args.train_size)*1.1)) #Read thorough the file lines
+	with open(summFile) as summary:
+		lines = random.sample(summary.readlines(),int(int(args.train_size)*1.1))
 		refName = 'trainingGenomes.txt'
-		refFile = open(refName, 'w') #The file with the reference files names
+		refFile = open(refName, 'w')
 		spTarget = args.sp.split(' ')
 		genoCount = 0
 		if len(spTarget)==1:
-	                for line in lines: #For each line in the file
-				line = line.rstrip('\n') #Chomp
-                	        fields = line.split('\t') #Split the fields by tabs
-	                        ftpName = fields[1].split('/')[-1] #Split the URL by '/'
-        	                ftpName = fields[1]+'/'+ftpName+'_genomic.fna.gz' #Add the file name and extension to be downloaded
+	                for line in lines:
+				line = line.rstrip('\n')
+                	        fields = line.split('\t')
+	                        ftpName = fields[1].split('/')[-1]
+        	                ftpName = fields[1]+'/'+ftpName+'_genomic.fna.gz'
 				spRef = fields[0].split(' ')
 				if genoCount==int(args.train_size):
 					break
 				elif str(spRef[0])==str(spTarget[0]):
 					continue
 				else :
-					outName = "_".join(fields[0].split(' '))+".fna.gz" #The output name
-		                        outName = outName.replace("(","") #Remove special characters from the file name
+					outName = "_".join(fields[0].split(' '))+".fna.gz"
+		                        outName = outName.replace("(","")
 	        	                outName = outName.replace(")","")
 	                	        outName = outName.replace(":","")
 		                        outName = outName.replace("/","_")
 		                        outName = outName.replace("'","")
 		                        outName = "_tempdir/"+outName
-		                        refFile.write(outName+'\n') #Write the file name into the reference files file
-		                        subprocess.call(["curl", ftpName, "-o", outName, "--silent"]) #Download the genome
-		                        fastaName = outName.rstrip('.gz') # The name of the fasta file
-		                        zipRef = gzip.open(outName, 'rb') #Unzip the file just downloaded
-		                        fastaFile = open(fastaName, 'wb') #The destination fasta
+		                        refFile.write(outName+'\n')
+		                        subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
+		                        fastaName = outName.rstrip('.gz')
+		                        zipRef = gzip.open(outName, 'rb')
+		                        fastaFile = open(fastaName, 'wb')
 		                        fastaFile.write( zipRef.read() )
 		                        zipRef.close()
 		                        fastaFile.close()
-		                        os.remove(outName) #Remove the files
-	        	                with open(fastaName) as inFile: #Add the genome to genomes.fna
+		                        os.remove(outName)
+	        	                with open(fastaName) as inFile:
 		                                for line in inFile:
 		                                        genomesFile.write(line)
 		                        os.remove(outName.rstrip('.gz'))
 					genoCount+=1
 		elif len(spTarget)==2:
-			for line in lines: #For each line in the file
-                                line = line.rstrip('\n') #Chomp
-                                fields = line.split('\t') #Split the fields by tabs
-                                ftpName = fields[1].split('/')[-1] #Split the URL by '/'
-                                ftpName = fields[1]+'/'+ftpName+'_genomic.fna.gz' #Add the file name and extension to be downloaded
+			for line in lines:
+                                line = line.rstrip('\n')
+                                fields = line.split('\t')
+                                ftpName = fields[1].split('/')[-1]
+                                ftpName = fields[1]+'/'+ftpName+'_genomic.fna.gz'
                                 spRef = fields[0].split(' ')
 				if genoCount==int(args.train_size):
                                         break
                                 elif spRef[0]==spTarget[0] and spRef[1]==spTarget[1]:
                                         continue
                                 else :
-                                        outName = "_".join(fields[0].split(' '))+".fna.gz" #The output name
-                                        outName = outName.replace("(","") #Remove special characters from the file name
+                                        outName = "_".join(fields[0].split(' '))+".fna.gz"
+                                        outName = outName.replace("(","")
                                         outName = outName.replace(")","")
                                         outName = outName.replace(":","")
                                         outName = outName.replace("/","_")
                                         outName = outName.replace("'","")
                                         outName = "_tempdir/"+outName
-                                        refFile.write(outName+'\n') #Write the file name into the reference files file
-                                        subprocess.call(["curl", ftpName, "-o", outName, "--silent"]) #Download the genome
-                                        fastaName = outName.rstrip('.gz') # The name of the fasta file
-                                        zipRef = gzip.open(outName, 'rb') #Unzip the file just downloaded
-                                        fastaFile = open(fastaName, 'wb') #The destination fasta
-                                        fastaFile.write( zipRef.read() )
+                                        refFile.write(outName+'\n')
+                                        subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
+                                        fastaName = outName.rstrip('.gz')
+                                        zipRef = gzip.open(outName, 'rb')
+                                        fastaFile = open(fastaName, 'wb')
+                                        fastaFile.write( zipRef.read() 
                                         zipRef.close()
                                         fastaFile.close()
-                                        os.remove(outName) #Remove the files
-                                        with open(fastaName) as inFile: #Add the genome to genomes.fna
+                                        os.remove(outName)
+                                        with open(fastaName) as inFile:
                                                 for line in inFile:
                                                         genomesFile.write(line)
                                         os.remove(outName.rstrip('.gz'))
@@ -237,7 +242,7 @@ else:
 		else:
 			sys.stderr.write('Error! Invalid species name')
 			sys.exit()
-                os.remove("_tempdir/assembly_summary_complete_genomes.txt") #Remove the summary file
+                os.remove("_tempdir/assembly_summary_complete_genomes.txt")
                 refFile.close()
 genomesFile.close()
 sys.stderr.write('Download finished a list of the genomes used can be found in "'+trainName+'"...\n')
@@ -250,15 +255,15 @@ sys.stderr.write('Constructing the training dataset...\n')
 if str(args.platform) == 'illumina':
 	for i in range(1,int(args.training_examples)+1):
 		numSeqs = int(int(args.num_reads)/int(args.train_size))
-		os.system("art_"+str(args.platform)+" -ss HS25 -i _tempdir/genomes.fna -o _tempdir/simulatedPos-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")#Positive examples
-		os.system("art_"+str(args.platform)+" -ss HS25 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")#Negative examples
-		os.remove("_tempdir/simulatedPos-"+str(i)+".aln") #Remove the alignment file
-		os.remove("_tempdir/simulatedNeg-"+str(i)+".aln") #Remove the alignment file
-	os.remove("_tempdir/genomes.fna") #Remove the genomes file
+		os.system("art_"+str(args.platform)+" -ss HS25 -i _tempdir/genomes.fna -o _tempdir/simulatedPos-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
+		os.system("art_"+str(args.platform)+" -ss HS25 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
+		os.remove("_tempdir/simulatedPos-"+str(i)+".aln")
+		os.remove("_tempdir/simulatedNeg-"+str(i)+".aln")
+	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
-	for i in range(1,int(args.training_examples)+1): #For each training datasets
-		os.system("art_illumina -ss HS25 -i "+str(args.target)+" -o _tempdir/simulatedTarget-"+str(i)+" -f "+str(random.uniform(0.01,0.1))+" -l "+str(args.read_length)+" > /dev/null") #Target datasets
-		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln") #Remove the alignment file
+	for i in range(1,int(args.training_examples)+1):
+		os.system("art_illumina -ss HS25 -i "+str(args.target)+" -o _tempdir/simulatedTarget-"+str(i)+" -f "+str(random.uniform(0.01,0.1))+" -l "+str(args.read_length)+" > /dev/null")
+		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln")
 	#3.1.3 Spike the negative datasets with varying amounts of the target genome
 		destFile = open("_tempdir/simulatedPos-"+str(i)+".fq","w")
 		with open("_tempdir/simulatedTarget-"+str(i)+".fq") as inFile:
@@ -272,39 +277,55 @@ for i in range(1,int(args.training_examples)+1):
 	fastq_to_fasta(fastqFileName,fastaFileName)
 
 '''4.0 Align the datasets to the target genome (Using BLAST of BLAT)'''
-sys.stderr.write('Formating BLAST database...\n')
-#================4.1 Create a database for the target==================
-if not os.path.exists('_tempdb'): #Create a temporary directory for the DB
-        os.makedirs('_tempdb')
-if args.prog=="blastn": #Check if the program to be used is blast
-	os.system("makeblastdb -in "+args.target+" -input_type fasta -dbtype nucl -out _tempdb/targetDB > /dev/null")
-#==========4.2 Align the reads of the datasets to the target===========
-sys.stderr.write('Recruiting reads to the target...\n')
-if not os.path.exists('_tempaln'): #Create a temporary directory for the alignments
-        os.makedirs('_tempaln')
-if args.prog=="blastn": #Check if the program to be used is blast
-	for filename in os.listdir("_tempdir/"):
-		if filename.endswith(".fa"):
-			blastCMD = NcbiblastxCommandline(cmd='blastn', outfmt=6, query="_tempdir/"+filename, db='_tempdb/targetDB', evalue=0.1, out="_tempaln/"+os.path.splitext(filename)[0]+".tbl")
-			blastCMD()
-else :
-	for filename in os.listdir("_tempdir/"):
-		os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
+if not os.path.exists('_tempaln'):
+	os.makedirs('_tempaln')
+if args.prog=="blastn":
+	sys.stderr.write('Formating BLAST database...\n')
+	#============4.1 Create a database for the target==============
+	if not os.path.exists('_tempdb'):
+		os.makedirs('_tempdb')
+	try:
+		os.system("makeblastdb -in "+args.target+" -input_type fasta -dbtype nucl -out _tempdb/targetDB > /dev/null")
+		#======4.2 Align the reads of the datasets to the target=======
+		sys.stderr.write('Recruiting reads to the target...\n')
+		for filename in os.listdir("_tempdir/"):
+			if filename.endswith(".fa"):
+				blastCMD = NcbiblastxCommandline(cmd='blastn', outfmt=6, query="_tempdir/"+filename, db='_tempdb/targetDB', evalue=0.1, out="_tempaln/"+os.path.splitext(filename)[0]+".tbl")
+				blastCMD()
+		os.system("rm -rf _tempdb _tempdir")
+	except:
+		sys.stderr.write('Error could not find "makeblastdb" or "blastn", make sure than the blast binaries are added to your $PATH!\n')i
+		os.system("rm -rf _tempdb _tempaln _tempdir")
+		sys.exit()
+elif args.prog=="blat":
+	try:
+		for filename in os.listdir("_tempdir/"):
+			os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
+		 os.system("rm -rf _tempdir")
+	except:
+		sys.stderr.write('Error could not find "blat" make sure the Blat binaries are added to your $PATH!\n')
+		os.system("rm -rf _tempaln _tempdir")
+		sys.exit()
+else:
+	sys.stderr.write('Invalid option -p '+str(args.prog)+' use either blat or blastn')
+	os.system("rm -rf _tempaln _tempdir")
+	sys.exit()
 
 '''5.0 Calculate the sequencing depth and breadth of the training datasetets'''
 sys.stderr.write('Calculating the training values...\n')
-genomeSize = get_genome_size(args.target) #Calculate the size of the target genome
-trainFile = open(trainName, 'w') #Create a new file for the values
-for filename in os.listdir("_tempaln/"): #For each alignment file
-	if filename.startswith("simulatedPos"): #If the set is positive
+genomeSize = get_genome_size(args.target)
+trainFile = open(trainName, 'w')
+for filename in os.listdir("_tempaln/")
+	if filename.startswith("simulatedPos")
 		targetPresent = 1
-	elif filename.startswith("simulatedNeg"): #If the set is negative
+	elif filename.startswith("simulatedNeg")
 		targetPresent = 0
-	trainArr = breadth_depth(genomeSize , "_tempaln/"+filename, int(args.perc_identity), int(args.aln_length)) #Calcuate sequencing depth and breadth
-	trainArr.append(targetPresent) #Append the value of presence
-	trainStr = str(trainArr[0])+","+str(trainArr[1])+","+str(trainArr[2])+"\n" #A string with the comma separated values
-	trainFile.write(trainStr) #Write the results as a csv
+	trainArr = breadth_depth(genomeSize , "_tempaln/"+filename, int(args.perc_identity), int(args.aln_length))
+	trainArr.append(targetPresent)
+	trainStr = str(trainArr[0])+","+str(trainArr[1])+","+str(trainArr[2])+"\n"
+	trainFile.write(trainStr)
 trainFile.close()
+os.system("rm -rf _tempaln")
 
 '''6.0 Determine the logistic model parameters based on the training data'''
 sys.stderr.write('Training the logistic model...\n')
@@ -331,7 +352,7 @@ except:
 	costGrad = compute_cost(initial_theta, X, y)
 	theta=decorated_cost(it, y, n)
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
-#6.3.2 Calculate based on sequencing breadth aand depth=====================
+#6.3.2 Calculate based on sequencing breadth and depth======================
 it = np.ones(shape=(m, n))
 it[:, 1:n+1] = X[:,0]
 try:
@@ -345,5 +366,6 @@ except:
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
 os.system("rm "+trainName)
 paramFile.close()
+os.system("rm "+str(trainName))
 sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
 #===========================================================================
