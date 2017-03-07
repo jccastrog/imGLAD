@@ -2,7 +2,7 @@
 '''
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 03-Mar-2017
+@update: 06-Mar-2017
 @version: 1.0.4
 @license: GNU General Public License v3.0.
 please type "./fitModel.py -h" for usage help
@@ -23,20 +23,20 @@ try :
 	from Bio.Seq import Seq
 	from Bio.Blast.Applications import NcbiblastxCommandline
 except:
-	sys.stderr.write('Module BioPython (Bio) is missing please install it before running fitModel.py\n')
+	sys.stderr.write('ERROR! Module BioPython (Bio) is missing please install it before running fitModel.py\n')
 	sys.exit()
 try:
 	import screed 
 except:
-	sys.stderr.write('Module "screed" is missing please install it before running fitModel.py\n')
+	sys.stderr.write('ERROR! Module "screed" is missing please install it before running fitModel.py\n')
 	sys.exit()
 try:
 	import statsmodels.discrete.discrete_model as sm
 except:
-	sys.stderr.write('Consider installing python module "statsmodels" for faster calculation of model parameters \n')
+	sys.stderr.write('WARNING! Consider installing python module "statsmodels" for faster calculation of model parameters \n')
 #=====================1.2 Initialize variables======================
 #1.2.1 Parser variables=============================================
-parser = argparse.ArgumentParser(description="fitModel: Using simulated metagenomes built with Grinder estimate the training parameters for detection in a metagenomic dataset [jccastrog@gatech.edu]")
+parser = argparse.ArgumentParser(description="fitModel: Using simulated metagenomes built with ART estimate the training parameters for detection in a metagenomic dataset [jccastrog@gatech.edu]")
 group = parser.add_argument_group('Required arguments') 
 group.add_argument('-t', action='store', dest='target', required=True, help='The target genome to be detected in FASTA format.')
 group.add_argument('-sp', action='store', dest='sp', required=True, help = 'The species of the genome written as binomial name in quotations. (e.g. "Escherichia coli")')
@@ -138,7 +138,7 @@ genomesFile = open('_tempdir/genomes.fna', 'w')
 #2.2.1 Download the list genomes========
 if args.genomes is not None:
 	if args.train_size is not None:
-		sys.stderr.write('Error! Argument -s ignored when using -l\n')
+		sys.stderr.write('ERROR! Argument -s ignored when using -l\n')
 	genomes = [line.rstrip('\n') for line in open(args.genomes)]
 	with open(summFile) as summary:
 		lines = summary.readlines()
@@ -230,7 +230,7 @@ else:
                                         fastaName = outName.rstrip('.gz')
                                         zipRef = gzip.open(outName, 'rb')
                                         fastaFile = open(fastaName, 'wb')
-                                        fastaFile.write( zipRef.read() 
+                                        fastaFile.write( zipRef.read() ) 
                                         zipRef.close()
                                         fastaFile.close()
                                         os.remove(outName)
@@ -240,7 +240,7 @@ else:
                                         os.remove(outName.rstrip('.gz'))
 					genoCount+=1
 		else:
-			sys.stderr.write('Error! Invalid species name')
+			sys.stderr.write('ERROR! Invalid species name')
 			sys.exit()
                 os.remove("_tempdir/assembly_summary_complete_genomes.txt")
                 refFile.close()
@@ -294,16 +294,16 @@ if args.prog=="blastn":
 				blastCMD()
 		os.system("rm -rf _tempdb _tempdir")
 	except:
-		sys.stderr.write('Error could not find "makeblastdb" or "blastn", make sure than the blast binaries are added to your $PATH!\n')i
+		sys.stderr.write('ERROR! Could not find "makeblastdb" or "blastn", make sure than the blast binaries are added to your $PATH!\n')
 		os.system("rm -rf _tempdb _tempaln _tempdir")
 		sys.exit()
 elif args.prog=="blat":
 	try:
 		for filename in os.listdir("_tempdir/"):
 			os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
-		 os.system("rm -rf _tempdir")
+		os.system("rm -rf _tempdir")
 	except:
-		sys.stderr.write('Error could not find "blat" make sure the Blat binaries are added to your $PATH!\n')
+		sys.stderr.write('ERROR! Could not find "blat" make sure the Blat binaries are added to your $PATH!\n')
 		os.system("rm -rf _tempaln _tempdir")
 		sys.exit()
 else:
@@ -315,10 +315,10 @@ else:
 sys.stderr.write('Calculating the training values...\n')
 genomeSize = get_genome_size(args.target)
 trainFile = open(trainName, 'w')
-for filename in os.listdir("_tempaln/")
-	if filename.startswith("simulatedPos")
+for filename in os.listdir("_tempaln/"):
+	if filename.startswith("simulatedPos"):
 		targetPresent = 1
-	elif filename.startswith("simulatedNeg")
+	elif filename.startswith("simulatedNeg"):
 		targetPresent = 0
 	trainArr = breadth_depth(genomeSize , "_tempaln/"+filename, int(args.perc_identity), int(args.aln_length))
 	trainArr.append(targetPresent)
@@ -349,7 +349,7 @@ try:
 except:
 	iniTheta = np.ones(shape=(m, n+1))
 	iniTheta[:, 1:n+1] = X
-	costGrad = compute_cost(initial_theta, X, y)
+	costGrad = compute_cost(iniTheta, X, y)
 	theta=decorated_cost(it, y, n)
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
 #6.3.2 Calculate based on sequencing breadth and depth======================
