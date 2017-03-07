@@ -2,7 +2,7 @@
 '''
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 06-Mar-2017
+@update: 07-Mar-2017
 @version: 1.0.4
 @license: GNU General Public License v3.0.
 please type "./fitModel.py -h" for usage help
@@ -42,7 +42,7 @@ group.add_argument('-t', action='store', dest='target', required=True, help='The
 group.add_argument('-sp', action='store', dest='sp', required=True, help = 'The species of the genome written as binomial name in quotations. (e.g. "Escherichia coli")')
 group = parser.add_argument_group('Simulated datasets arguments') 
 group.add_argument('-l', action='store', dest='genomes', required=False, help='The genomes list to create the training dataset')
-group.add_argument('-s', action='store', dest='train_size', required=False, default=200, help='Size of the training dataset in number of genomes (Incompatible with -l). (default : %(default)s)')
+group.add_argument('-s', action='store', dest='train_size', required=False, default=200, help='Number of genomes included in the training dataset (Incompatible with -l). (default : %(default)s)')
 group.add_argument('-e', action='store', dest='training_examples', required=False, default=100, help='Number of training examples (metagenomic datasets) used to train the model by default 200 (100 positive and 100 negative examples. (default : %(default)s)')
 group.add_argument('-j', action='store', dest='platform', required=False, default='illumina', help='The sequencing platform used to generate the reads in the datasets. (default : %(default)s)')
 group.add_argument('-r', action='store', dest='num_reads', required=False, default=1000000, help='Number of reads per training example (Metagenomic dataset simulated). (default : %(default)s)')
@@ -129,7 +129,7 @@ def decorated_cost(it, y, n):
 if not os.path.exists("_tempdir"):
 	os.makedirs("_tempdir") 
 os.system("curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/assembly_summary.txt -o _tempdir/genomes.txt --silent")
-os.system("awk -F '\t' -v OFS='\t' '{if($12==\"Complete Genome\") print $8, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt")
+os.system("awk -F '\t' -v OFS='\t' '{if($12==\"Complete Genome\") print $1, $8, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt")
 os.remove('_tempdir/genomes.txt')
 summFile='_tempdir/assembly_summary_complete_genomes.txt'
 #=======2.2 Download the genomes========
@@ -147,9 +147,9 @@ if args.genomes is not None:
 			line = line.rstrip('\n')
 			fields = line.split('\t')
 			if fields[0] in genomes:
-				fileName = fields[1].split('/')[-1]
-				fileName = fields[1]+'/'+fileName+'_genomic.fna.gz'
-				outName = "_tempdir/"+"_".join(fields[0].split(' '))+".fna.gz"
+				fileName = fields[2].split('/')[-1]
+				fileName = fields[2]+'/'+fileName+'_genomic.fna.gz'
+				outName = "_tempdir/"+"_".join(fields[1].split(' '))+".fna.gz"
 				refFile.write(outName+'\n')
 				subprocess.call(["curl", fileName, "-o", outName, "--silent"])
 				fastaName = outName.rstrip('.gz')
@@ -177,15 +177,15 @@ else:
 	                for line in lines:
 				line = line.rstrip('\n')
                 	        fields = line.split('\t')
-	                        ftpName = fields[1].split('/')[-1]
-        	                ftpName = fields[1]+'/'+ftpName+'_genomic.fna.gz'
-				spRef = fields[0].split(' ')
+	                        ftpName = fields[2].split('/')[-1]
+        	                ftpName = fields[2]+'/'+ftpName+'_genomic.fna.gz'
+				spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
 					break
 				elif str(spRef[0])==str(spTarget[0]):
 					continue
 				else :
-					outName = "_".join(fields[0].split(' '))+".fna.gz"
+					outName = "_".join(fields[1].split(' '))+".fna.gz"
 		                        outName = outName.replace("(","")
 	        	                outName = outName.replace(")","")
 	                	        outName = outName.replace(":","")
@@ -210,15 +210,15 @@ else:
 			for line in lines:
                                 line = line.rstrip('\n')
                                 fields = line.split('\t')
-                                ftpName = fields[1].split('/')[-1]
-                                ftpName = fields[1]+'/'+ftpName+'_genomic.fna.gz'
-                                spRef = fields[0].split(' ')
+                                ftpName = fields[2].split('/')[-1]
+                                ftpName = fields[2]+'/'+ftpName+'_genomic.fna.gz'
+                                spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
                                         break
                                 elif spRef[0]==spTarget[0] and spRef[1]==spTarget[1]:
                                         continue
                                 else :
-                                        outName = "_".join(fields[0].split(' '))+".fna.gz"
+                                        outName = "_".join(fields[1].split(' '))+".fna.gz"
                                         outName = outName.replace("(","")
                                         outName = outName.replace(")","")
                                         outName = outName.replace(":","")
@@ -273,8 +273,13 @@ if str(args.platform) == 'illumina':
 #================3.2 Convert the reads to fasta================
 for i in range(1,int(args.training_examples)+1):
 	fastqFileName = "_tempdir/simulatedPos-"+str(i)+".fq"
+	fastaFileName = "_tempdir/simulatedPos-"+str(i)+".fa"
+	fastq_to_fasta(fastqFileName,fastaFileName)
+	fastqFileName = "_tempdir/simulatedNeg-"+str(i)+".fq"
 	fastaFileName = "_tempdir/simulatedNeg-"+str(i)+".fa"
 	fastq_to_fasta(fastqFileName,fastaFileName)
+
+
 
 '''4.0 Align the datasets to the target genome (Using BLAST of BLAT)'''
 if not os.path.exists('_tempaln'):
@@ -300,7 +305,8 @@ if args.prog=="blastn":
 elif args.prog=="blat":
 	try:
 		for filename in os.listdir("_tempdir/"):
-			os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
+			if filename.endswith(".fa"):
+				os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
 		os.system("rm -rf _tempdir")
 	except:
 		sys.stderr.write('ERROR! Could not find "blat" make sure the Blat binaries are added to your $PATH!\n')
