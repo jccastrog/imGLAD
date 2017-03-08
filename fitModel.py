@@ -245,7 +245,7 @@ else:
                 os.remove("_tempdir/assembly_summary_complete_genomes.txt")
                 refFile.close()
 genomesFile.close()
-sys.stderr.write('Download finished a list of the genomes used can be found in "'+trainName+'"...\n')
+sys.stderr.write('Download finished a list of the genomes used can be found in "'+refName+'"...\n')
 ### Compare the genomes to the ANI DB ###
 
 '''3.0 Create training datasets from random reads'''
