@@ -249,7 +249,7 @@ sys.stderr.write('Download finished a list of the genomes used can be found in "
 ### Compare the genomes to the ANI DB ###
 
 '''3.0 Create training datasets from random reads'''
-sys.stderr.write('Constructing the training dataset...\n')
+sys.stderr.write('Constructing the training datasets...\n')
 #=3.1 Create random reads for the selected genomes with grinder=
 #3.1.1 Create reads from the background genomes=================
 if str(args.platform) == 'illumina':
@@ -360,7 +360,7 @@ except:
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
 #6.3.2 Calculate based on sequencing breadth and depth======================
 it = np.ones(shape=(m, n))
-it[:, 1:n+1] = X[:,0]
+it[:, n-1] = X[:,0]
 try:
 	        logit = sm.Logit(y, it)
 		theta = logit.fit().params
