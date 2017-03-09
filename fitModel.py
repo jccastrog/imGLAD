@@ -2,7 +2,7 @@
 '''
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 07-Mar-2017
+@update: 08-Mar-2017
 @version: 1.0.4
 @license: GNU General Public License v3.0.
 please type "./fitModel.py -h" for usage help
@@ -150,7 +150,7 @@ if args.genomes is not None:
 				fileName = fields[2].split('/')[-1]
 				fileName = fields[2]+'/'+fileName+'_genomic.fna.gz'
 				outName = "_tempdir/"+"_".join(fields[1].split(' '))+".fna.gz"
-				refFile.write(outName+'\n')
+				refFile.write(os.path.basename(outName)+'\n')
 				subprocess.call(["curl", fileName, "-o", outName, "--silent"])
 				fastaName = outName.rstrip('.gz')
 				zipRef = zip.open(outName, 'rb')
@@ -192,7 +192,7 @@ else:
 		                        outName = outName.replace("/","_")
 		                        outName = outName.replace("'","")
 		                        outName = "_tempdir/"+outName
-		                        refFile.write(outName+'\n')
+		                        refFile.write(os.path.basename(outName)+'\n')
 		                        subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
 		                        fastaName = outName.rstrip('.gz')
 		                        zipRef = gzip.open(outName, 'rb')
@@ -225,7 +225,7 @@ else:
                                         outName = outName.replace("/","_")
                                         outName = outName.replace("'","")
                                         outName = "_tempdir/"+outName
-                                        refFile.write(outName+'\n')
+                                        refFile.write(os.path.basename(outName)+'\n')
                                         subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
                                         fastaName = outName.rstrip('.gz')
                                         zipRef = gzip.open(outName, 'rb')
@@ -260,15 +260,18 @@ if str(args.platform) == 'illumina':
 	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
 	for i in range(1,int(args.training_examples)+1):
-		os.system("art_illumina -ss HS25 -i "+str(args.target)+" -o _tempdir/simulatedPos-"+str(i)+" -f "+str(random.uniform(0.01,0.1))+" -l "+str(args.read_length)+" > /dev/null")
-		os.remove("_tempdir/simulatedPos-"+str(i)+".aln")
+		os.system("art_illumina -ss HS25 -i "+str(args.target)+" -o _tempdir/simulatedTarget-"+str(i)+" -f "+str(random.uniform(0.01,0.1))+" -l "+str(args.read_length)+" > /dev/null")
+		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln")
 	#3.1.3 Spike the negative datasets with varying amounts of the target genome
-		destFile = open("_tempdir/simulatedPos-"+str(i)+".fq","w")
-		with open("_tempdir/simulatedNeg-"+str(i)+".fq") as inFile:
-			for line in inFile:
-				destFile.write(line)
-		destFile.close()
-#		os.remove("_tempdir/simulatedTarget-"+str(i)+".fq")
+		destFile = "_tempdir/simulatedPos-"+str(i)+".fq"
+		with open(destFile, 'w') as outFile:
+			with open("_tempdir/simulatedNeg-"+str(i)+".fq") as inFile:
+				for line in inFile:
+					outFile.write(line)
+			with open("_tempdir/simulatedTarget-"+str(i)+".fq") as inFile:
+				for line in inFile:
+					outFile.write(line)
+		os.remove("_tempdir/simulatedTarget-"+str(i)+".fq")
 #================3.2 Convert the reads to fasta================
 for i in range(1,int(args.training_examples)+1):
 	fastqFileName = "_tempdir/simulatedPos-"+str(i)+".fq"
@@ -281,6 +284,7 @@ for i in range(1,int(args.training_examples)+1):
 	os.remove(fastqFileName)
 
 '''4.0 Align the datasets to the target genome (Using BLAST of BLAT)'''
+sys.stderr.write('Recruiting reads to the target genome...\n')
 if not os.path.exists('_tempaln'):
 	os.makedirs('_tempaln')
 if args.prog=="blastn":
@@ -306,7 +310,7 @@ elif args.prog=="blat":
 		for filename in os.listdir("_tempdir/"):
 			if filename.endswith(".fa"):
 				os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
-		os.system("rm -rf _tempdir")
+#		os.system("rm -rf _tempdir")
 	except:
 		sys.stderr.write('ERROR! Could not find "blat" make sure the Blat binaries are added to your $PATH!\n')
 		os.system("rm -rf _tempaln _tempdir")
@@ -345,7 +349,7 @@ m, n = X.shape
 y.shape = (m, 1)
 #=======================6.3 Calculate the parameters========================
 paramFile = open(paramName, 'w')
-#6.3.1Calculate based on sequencing breadth only============================
+#6.3.1 Calculate based on sequencing breadth only===========================
 it = np.ones(shape=(m, n+1))
 it[:, 1:n+1] = X
 try:
@@ -370,4 +374,7 @@ paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
 os.system("rm "+str(trainName))
 sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
+#=====================6.4 Establish the detection limit=====================
+detLimit = (2.944439 - theta[0])/theta[1]
+print detLimit
 #===========================================================================
