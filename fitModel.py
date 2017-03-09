@@ -250,36 +250,35 @@ sys.stderr.write('Download finished a list of the genomes used can be found in "
 
 '''3.0 Create training datasets from random reads'''
 sys.stderr.write('Constructing the training datasets...\n')
-#=3.1 Create random reads for the selected genomes with grinder=
+#===3.1 Create random reads for the selected genomes with ART===
 #3.1.1 Create reads from the background genomes=================
 if str(args.platform) == 'illumina':
 	for i in range(1,int(args.training_examples)+1):
 		numSeqs = int(int(args.num_reads)/int(args.train_size))
-		os.system("art_"+str(args.platform)+" -ss HS25 -i _tempdir/genomes.fna -o _tempdir/simulatedPos-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
 		os.system("art_"+str(args.platform)+" -ss HS25 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
-		os.remove("_tempdir/simulatedPos-"+str(i)+".aln")
 		os.remove("_tempdir/simulatedNeg-"+str(i)+".aln")
 	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
 	for i in range(1,int(args.training_examples)+1):
-		os.system("art_illumina -ss HS25 -i "+str(args.target)+" -o _tempdir/simulatedTarget-"+str(i)+" -f "+str(random.uniform(0.01,0.1))+" -l "+str(args.read_length)+" > /dev/null")
-		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln")
+		os.system("art_illumina -ss HS25 -i "+str(args.target)+" -o _tempdir/simulatedPos-"+str(i)+" -f "+str(random.uniform(0.01,0.1))+" -l "+str(args.read_length)+" > /dev/null")
+		os.remove("_tempdir/simulatedPos-"+str(i)+".aln")
 	#3.1.3 Spike the negative datasets with varying amounts of the target genome
 		destFile = open("_tempdir/simulatedPos-"+str(i)+".fq","w")
-		with open("_tempdir/simulatedTarget-"+str(i)+".fq") as inFile:
+		with open("_tempdir/simulatedNeg-"+str(i)+".fq") as inFile:
 			for line in inFile:
 				destFile.write(line)
 		destFile.close()
+#		os.remove("_tempdir/simulatedTarget-"+str(i)+".fq")
 #================3.2 Convert the reads to fasta================
 for i in range(1,int(args.training_examples)+1):
 	fastqFileName = "_tempdir/simulatedPos-"+str(i)+".fq"
 	fastaFileName = "_tempdir/simulatedPos-"+str(i)+".fa"
 	fastq_to_fasta(fastqFileName,fastaFileName)
+	os.remove(fastqFileName)
 	fastqFileName = "_tempdir/simulatedNeg-"+str(i)+".fq"
 	fastaFileName = "_tempdir/simulatedNeg-"+str(i)+".fa"
 	fastq_to_fasta(fastqFileName,fastaFileName)
-
-
+	os.remove(fastqFileName)
 
 '''4.0 Align the datasets to the target genome (Using BLAST of BLAT)'''
 if not os.path.exists('_tempaln'):
@@ -355,22 +354,19 @@ try:
 except:
 	iniTheta = np.ones(shape=(m, n+1))
 	iniTheta[:, 1:n+1] = X
-	costGrad = compute_cost(iniTheta, X, y)
 	theta=decorated_cost(it, y, n)
-paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
+paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2])+"\n")
 #6.3.2 Calculate based on sequencing breadth and depth======================
 it = np.ones(shape=(m, n))
 it[:, n-1] = X[:,0]
 try:
-	        logit = sm.Logit(y, it)
-		theta = logit.fit().params
+	logit = sm.Logit(y, it)
+	theta = logit.fit().params
 except:
-	        iniTheta = np.ones(shape=(m, n+1))
-		iniTheta[:, 1:n+1] = X
-		costGrad = compute_cost(initial_theta, X, y)
-		theta=decorated_cost(it, y, n)
-paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2]))
-os.system("rm "+trainName)
+	iniTheta = np.ones(shape=(m, n+1))
+	iniTheta[:, 1:n+1] = X
+	theta=decorated_cost(it, y, n)
+paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
 os.system("rm "+str(trainName))
 sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
