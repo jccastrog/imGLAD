@@ -2,7 +2,7 @@
 '''
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 08-Mar-2017
+@update: 10-Mar-2017
 @version: 1.0.4
 @license: GNU General Public License v3.0.
 please type "./fitModel.py -h" for usage help
@@ -57,6 +57,7 @@ downloadDict=dict()
 trainName = 'trainingValues.csv'
 refName = 'trainingGenomes.txt'
 paramName = 'parameters.txt'
+detName = 'detectionLimit.txt'
 #=======================1.3 Define functions=========================
 def fastq_to_fasta(fastqFile,fastaFile):
 	fasta = open(fastaFile,'w')
@@ -376,5 +377,7 @@ os.system("rm "+str(trainName))
 sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
 #=====================6.4 Establish the detection limit=====================
 detLimit = (2.944439 - theta[0])/theta[1]
-print detLimit
+detFile = open(detName, 'w')
+detFile.write('Thanks for using imGLAD\n')
+detFile.write('The detection limit for your '+args.sp+' genome is: '+str(detLimit)+' in terms of sequencing breadth of the genome. This means you need to sample at least '++str(detLimit*100)+' of the genome in order to detect it.') 
 #===========================================================================
