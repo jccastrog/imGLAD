@@ -13,7 +13,7 @@ Clone the git repository
 
 You can also download the zip file from the GitHub site https://github.com/jccastrog/imGLAD
 
-System rquirements
+System requirements
 ------------------
 
 Python 2.7 or higher.

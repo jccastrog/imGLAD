@@ -90,7 +90,7 @@
 <tr><td>&nbsp;</td><td>Number of training examples (metagenomic datasets) used to train the model by default 200 (100 positive and 100 negative examples. (default : 100)</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-j <var>PLATFORM</var></span></kbd></td>
-<td>The sequencing platform used to generate the reads in the datasets. (default : illumina)</td></tr>
+<td>The sequencing platform used to generate reads in the datasets. (default : illumina)</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-r <var>NUM_READS</var></span></kbd></td>
 <td>Number of reads per training example (Metagenomic dataset simulated). (default : 1000000)</td></tr>
@@ -128,7 +128,7 @@
 </div>
 <div class="section" id="using-random-genomes-from-ncbi">
 <h2>Using random genomes from NCBI<a class="headerlink" href="#using-random-genomes-from-ncbi" title="Permalink to this headline">¶</a></h2>
-<p>If you don&#8217;t have any preference regarding the genomes used to build the training set, imGLAD can built a model with a random number of genomes from NCBI, the user can prive the number of genomes to be used.</p>
+<p>If you don&#8217;t have any preference regarding the genomes used to build the training set, imGLAD can built a model with a random number of genomes from NCBI. The user can provide the number of genomes to be used.</p>
 <div class="section" id="example-2">
 <h3>Example 2<a class="headerlink" href="#example-2" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal"><span class="pre">$&gt;./fitModel.py</span> <span class="pre">-t</span> <span class="pre">genome.fa</span> <span class="pre">-sp</span> <span class="pre">'Escherichia</span> <span class="pre">coli'</span> <span class="pre">-s</span> <span class="pre">100</span></code></p>
@@ -155,7 +155,7 @@
 <div class="section" id="example-4">
 <h3>Example 4<a class="headerlink" href="#example-4" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal"><span class="pre">$&gt;./fitModel.py</span> <span class="pre">-t</span> <span class="pre">genome.fa</span> <span class="pre">-sp</span> <span class="pre">'Escherichia</span> <span class="pre">coli'</span> <span class="pre">-j</span> <span class="pre">illumina</span></code></p>
-<p>Specifying <code class="docutils literal"><span class="pre">-j</span></code> instructs <code class="docutils literal"><span class="pre">fitModel.py</span></code> to use a specific platform for read generation in this case Illumina. Altough solid and Roche 454 technologies are also available.</p>
+<p>Specifying <code class="docutils literal"><span class="pre">-j</span></code> instructs <code class="docutils literal"><span class="pre">fitModel.py</span></code> to use a specific platform for read generation in this case Illumina. Although solid and Roche 454 technologies are also available.</p>
 </div>
 <div class="section" id="example-5">
 <h3>Example 5<a class="headerlink" href="#example-5" title="Permalink to this headline">¶</a></h3>

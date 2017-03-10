@@ -1,0 +1,28 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Table of Contents:}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Getting started}{1}{section.1.1}
+\contentsline {subsection}{\numberline {1.1.1}What is imGLAD?}{1}{subsection.1.1.1}
+\contentsline {subsection}{\numberline {1.1.2}Obtaining imGLAD}{1}{subsection.1.1.2}
+\contentsline {subsection}{\numberline {1.1.3}System requirements}{1}{subsection.1.1.3}
+\contentsline {subsubsection}{Python requirements}{1}{subsubsection*.3}
+\contentsline {section}{\numberline {1.2}Model fitting}{1}{section.1.2}
+\contentsline {subsection}{\numberline {1.2.1}General options}{2}{subsection.1.2.1}
+\contentsline {subsection}{\numberline {1.2.2}The training dataset}{2}{subsection.1.2.2}
+\contentsline {subsection}{\numberline {1.2.3}Using your own list of genomes}{2}{subsection.1.2.3}
+\contentsline {subsubsection}{Example 1}{2}{subsubsection*.4}
+\contentsline {subsection}{\numberline {1.2.4}Using random genomes from NCBI}{3}{subsection.1.2.4}
+\contentsline {subsubsection}{Example 2}{3}{subsubsection*.5}
+\contentsline {subsection}{\numberline {1.2.5}Output files}{3}{subsection.1.2.5}
+\contentsline {subsection}{\numberline {1.2.6}General use examples}{3}{subsection.1.2.6}
+\contentsline {subsubsection}{Example 3}{3}{subsubsection*.6}
+\contentsline {subsubsection}{Example 4}{4}{subsubsection*.7}
+\contentsline {subsubsection}{Example 5}{4}{subsubsection*.8}
+\contentsline {subsubsection}{Example 6}{4}{subsubsection*.9}
+\contentsline {section}{\numberline {1.3}Probability estimation}{4}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}Getting started}{4}{subsection.1.3.1}
+\contentsline {subsection}{\numberline {1.3.2}General options}{4}{subsection.1.3.2}
+\contentsline {subsubsection}{Required arguments}{4}{subsubsection*.10}
+\contentsline {subsection}{\numberline {1.3.3}Single mode}{4}{subsection.1.3.3}
+\contentsline {subsubsection}{Example 1}{5}{subsubsection*.11}
+\contentsline {subsection}{\numberline {1.3.4}General mode}{5}{subsection.1.3.4}
+\contentsline {subsubsection}{Example 2}{5}{subsubsection*.12}
