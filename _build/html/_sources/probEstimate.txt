@@ -1,0 +1,54 @@
+Probability estimation
+======================
+``probEstimate.py`` estimates the likelihood of presence of your target genome in a metagenomic sample (one or more).
+
+Getting started
+---------------
+First you need to run ``fitModel.py`` and get the parameters file it generatesi (``parameters.txt``).
+
+Before running ``probEstimate.py`` you should also run a Blastn or Blat of your metagenomic sample against the target genome you created the model with. The output should be stored in tabular format.
+
+General options
+---------------
+
+Required arguments
+__________________
+-t TARGET       Subject sequences (ref) in FastA format.
+-m MAP  One or more Tabular BLAST files of reads vs genes (or contigs).
+-p PARAM        Parameters file obtained from fitModel.py
+
+Single mode
+-----------
+The ``parameters.txt`` file will save parameters for a model based on sequencing breath only and a model based o sequeincing breadth and depth. Single mode will use sequencing breadth parameters to estimate the likelihood of presence.
+
+Example 1
+_________
+``$>./probEstimate.py -t genome.fa -m blastTab_01.tbl -p parameters.txt -l single``
+
+The above line will estimate the likelihood of presence of the target genome in the metagenomic sample, based on sequencing breadth, the results will be displayed in the screen like.
+
+========== ================== ================ =======
+Filename   Sequencing breadth Sequencing depth P-value
+---------- ------------------ ---------------- -------
+file01.tsv float              float            float
+========== ================== ================ =======
+
+You can save these results by redirecting the output to a file.
+
+``$>./probEstimate.py -t genome.fa -m blastTab_01.tbl -p parameters.txt -l single  > results.tsv``
+
+General mode
+------------
+``fitModel.py`` estimates parameters for the model based on sequencing depth as well. If general mode is used both variables will be used to calculate the precense probability.
+
+Example 2
+_________
+
+``$>./probEstimate.py -t genome.fa -m blastTab_01.tbl -p parameters.txt -l general``
+
+Will instruct ``probEstimate.py`` to include sequencing depth in the calculation of likelihood for presence.
+
+**NOTE:** Using general mode can lead to false positive identification due to high mapping of conserved regions, plasmids, or mobile elements.
+
+
+

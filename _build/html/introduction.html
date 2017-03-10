@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Tutorial &#8212; imGLAD 1.0 documentation</title>
+    <title>Getting started &#8212; imGLAD 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,7 +26,8 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="imGLAD 1.0 documentation" href="index.html" />
-    <link rel="prev" title="Getting started" href="fitModel.html" /> 
+    <link rel="next" title="Model fitting" href="fitModel.html" />
+    <link rel="prev" title="imGLAD Bacterial genome detection in metagenomic datasets" href="index.html" /> 
   </head>
   <body role="document">
     <div class="related" role="navigation" aria-label="related navigation">
@@ -36,7 +37,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="fitModel.html" title="Getting started"
+          <a href="fitModel.html" title="Model fitting"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="imGLAD Bacterial genome detection in metagenomic datasets"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">imGLAD 1.0 documentation</a> &#187;</li> 
       </ul>
@@ -47,17 +51,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="tutorial">
-<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-imglad">
+<h2>What is imGLAD?<a class="headerlink" href="#what-is-imglad" title="Permalink to this headline">¶</a></h2>
+<p>imGLAD is a computational tool for detection of bacterial genomes in metagenomic datasets. imGLAD has two steps fitting a model and predicting data. The fitting step simulates metagenomic datasets and randoly spikes them with the target genome. This is used to create a logistic model to discriminate positive samples from negative samples. The prediction step uses the model paramters to estimate the likelihood of presence of the target genome in a given metagenomic sample.</p>
+</div>
+<div class="section" id="obtaining-imglad">
+<h2>Obtaining imGLAD<a class="headerlink" href="#obtaining-imglad" title="Permalink to this headline">¶</a></h2>
+<p>Clone the git repository</p>
+<blockquote>
+<div><code class="docutils literal"><span class="pre">$&gt;</span> <span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/jccastrog/imGLAD</span></code></div></blockquote>
+<p>You can also download the zip file from the GitHub site <a class="reference external" href="https://github.com/jccastrog/imGLAD">https://github.com/jccastrog/imGLAD</a></p>
+</div>
 <div class="section" id="system-rquirements">
-<h2>0.0 System rquirements<a class="headerlink" href="#system-rquirements" title="Permalink to this headline">¶</a></h2>
+<h2>System rquirements<a class="headerlink" href="#system-rquirements" title="Permalink to this headline">¶</a></h2>
+<p>Python 2.7 or higher.</p>
+<p>ART 2.5.8 or higher.</p>
+<p>Either BLAST 2.2.28 (or higher) or BLAT (any version)</p>
+<div class="section" id="python-requirements">
+<h3>Python requirements<a class="headerlink" href="#python-requirements" title="Permalink to this headline">¶</a></h3>
+<p>numpy, scipy, biopython, gzip, screed, statsmodel (optional)</p>
 </div>
-<div class="section" id="getting-started">
-<h2>1.0 Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>To use imGLAD you need a genome from the organism you want to identify (target)</p>
-</div>
-<div class="section" id="the-training-set">
-<h2>2.0 The training set<a class="headerlink" href="#the-training-set" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -69,21 +84,27 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Tutorial</a><ul>
-<li><a class="reference internal" href="#system-rquirements">0.0 System rquirements</a></li>
-<li><a class="reference internal" href="#getting-started">1.0 Getting started</a></li>
-<li><a class="reference internal" href="#the-training-set">2.0 The training set</a></li>
+<li><a class="reference internal" href="#">Getting started</a><ul>
+<li><a class="reference internal" href="#what-is-imglad">What is imGLAD?</a></li>
+<li><a class="reference internal" href="#obtaining-imglad">Obtaining imGLAD</a></li>
+<li><a class="reference internal" href="#system-rquirements">System rquirements</a><ul>
+<li><a class="reference internal" href="#python-requirements">Python requirements</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">imGLAD Bacterial genome detection in metagenomic datasets</a></p>
+  <h4>Next topic</h4>
   <p class="topless"><a href="fitModel.html"
-                        title="previous chapter">Getting started</a></p>
+                        title="next chapter">Model fitting</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/tutorial.txt"
+      <li><a href="_sources/introduction.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -108,7 +129,10 @@
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="fitModel.html" title="Getting started"
+          <a href="fitModel.html" title="Model fitting"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="imGLAD Bacterial genome detection in metagenomic datasets"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">imGLAD 1.0 documentation</a> &#187;</li> 
       </ul>
