@@ -375,8 +375,8 @@ except:
 	iniTheta = np.ones(shape=(m, n+1))
 	iniTheta[:, 1:n+1] = X
 	theta=decorated_cost(it, y, n)i
-#except:
-#	theta = [-34.738273,550.229,1080.350]
+
+	theta = [-631.5,70164.7]
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
 os.system("rm "+str(trainName))
