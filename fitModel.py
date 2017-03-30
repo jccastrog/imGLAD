@@ -2,7 +2,7 @@
 '''
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 10-Mar-2017
+@update: 15-Mar-2017
 @version: 1.0.4
 @license: GNU General Public License v3.0.
 please type "./fitModel.py -h" for usage help
@@ -256,12 +256,12 @@ sys.stderr.write('Constructing the training datasets...\n')
 if str(args.platform) == 'illumina':
 	for i in range(1,int(args.training_examples)+1):
 		numSeqs = int(int(args.num_reads)/int(args.train_size))
-		os.system("art_"+str(args.platform)+" -ss HS25 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
+		os.system("art_"+str(args.platform)+" -ss MSv3 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
 		os.remove("_tempdir/simulatedNeg-"+str(i)+".aln")
 	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
 	for i in range(1,int(args.training_examples)+1):
-		os.system("art_illumina -ss HS25 -i "+str(args.target)+" -o _tempdir/simulatedTarget-"+str(i)+" -f "+str(random.uniform(0.005,0.05))+" -l "+str(args.read_length)+" > /dev/null")
+		os.system("art_illumina -ss MSv3 -i "+str(args.target)+" -o _tempdir/simulatedTarget-"+str(i)+" -f "+str(random.uniform(0.005,0.05))+" -l "+str(args.read_length)+" > /dev/null")
 		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln")
 	#3.1.3 Spike the negative datasets with varying amounts of the target genome
 		destFile = "_tempdir/simulatedPos-"+str(i)+".fq"
@@ -360,6 +360,10 @@ except:
 	iniTheta = np.ones(shape=(m, n+1))
 	iniTheta[:, 1:n+1] = X
 	theta=decorated_cost(it, y, n)
+except:
+	sys.stderr.write('ERROR! Perfect separation found. Couldnt opimize the regression parameters.\n')
+	sys.stderr.wrtie('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
+	theta = [-34.738273,550.229,1080.350]
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2])+"\n")
 #6.3.2 Calculate based on sequencing breadth and depth======================
 it = np.ones(shape=(m, n))
@@ -370,7 +374,9 @@ try:
 except:
 	iniTheta = np.ones(shape=(m, n+1))
 	iniTheta[:, 1:n+1] = X
-	theta=decorated_cost(it, y, n)
+	theta=decorated_cost(it, y, n)i
+#except:
+#	theta = [-34.738273,550.229,1080.350]
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
 os.system("rm "+str(trainName))
