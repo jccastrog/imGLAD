@@ -2,7 +2,7 @@
 '''
 @name: myTaxaFilter.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 16-Mar-2017
+@update: 31-Mar-2017
 @version: 1.0.0
 @license: GNU General Public License v3.0.
 please type "./myTaxaFilter.py -h" for usage help
@@ -33,7 +33,9 @@ args = parser.parse_args()
 #1.2.2 Global variables==============================================
 fragmentLength = 1000
 fragsName = 'fragments.fa'
-alignName = 'myTAxaAlign.tbl'
+alignName = 'myTaxaAlign.tbl'
+myTaxaName = 'myTaxaIn.txt'
+outName = 'myTaxaOut.txt'
 path = os.path.dirname(os.path.realpath(__file__))
 #=======================1.3 Define functions=========================
 def genome_fragments(genomeFile,size,outFile):
@@ -48,7 +50,7 @@ def genome_fragments(genomeFile,size,outFile):
 				fragSeq = seq[size*(i-1):fragmentLength*i]
 				fragsFile.write(ID+str(i)+'\n')
 				fragsFile.write(fraqSeq+'\n')
-		fragsFile.close()
+		r ~/JuanCamilo/GaTech/USDA_Spinach/test.txt test.out 70 iagsFile.close()
 
 '''2.0 Align the genome segments to the protein databaseDownload the gneomes from NCBI'''
 #=======================2.1 Create fragments from the genome file========================
@@ -56,8 +58,14 @@ genome_fragments(args.target,fragmentLength,fragsName)
 #==============2.2 Align the fragments to the MyTaxa database with diamond===============
 os.system("diamond blastx -q "+args.target+" -d "+args.db+" -p "+args.threads+" --out "+alignName+" -f 6")
 #================2.3 Format the allignment table with BlastTab.catsbj.pl=================
+os.system(path+"BlastTab.metaxaPrep.pl -q -f no genes.txt "+alignName+" > "+myTaxaName)
+os.remove(alignName)
 
+'''3.0 Run myTaxa and select the regions to be removed'''
+#=====================3.1 Run MyTaxa=====================
+os.syystem(args.my_taxa+"/MyTaxa "+myTaxaName+" "+outName+" 70") 
 
+'''4.0 Remove the regions selected from the original genome'''
 
 
 
