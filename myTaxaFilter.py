@@ -21,7 +21,7 @@ except:
 
 #=====================1.2 Initialize variables======================
 #1.2.1 Parser variables=============================================
-parser = argparse.ArgumentParser(description="myTaxaFilter.py: Use MyTaxa to filter un-specific regions of the target genome [jccastrog@gatech.edu]")
+parser = argparse.ArgumentParser(description="myTaxaFilter.py: Use MyTaxa to filter un-specific regions of the target genome. Before running myTaxaFilter you should install MyTaxa (https://github.com/luo-chengwei/MyTaxa) as well as download the AllGenome database in diamond format (http://enve-omics.ce.gatech.edu/data/public_mytaxa/AllGenomes.faa.dmnd) [jccastrog@gatech.edu]")
 group = parser.add_argument_group('Required arguments')
 group.add_argument('-t', action='store', dest='target', required=True, help='The target genome to in FASTA format.')
 group.add_argument('-mt', action='store', dest='my_Taxa', required=True, help = 'Path to the MyTaxa binaries.')
@@ -36,6 +36,7 @@ fragsName = 'fragments.fa'
 alignName = 'myTaxaAlign.tbl'
 myTaxaName = 'myTaxaIn.txt'
 outName = 'myTaxaOut.txt'
+vals = []
 path = os.path.dirname(os.path.realpath(__file__))
 #=======================1.3 Define functions=========================
 def genome_fragments(genomeFile,size,outFile):
@@ -48,9 +49,9 @@ def genome_fragments(genomeFile,size,outFile):
 			numFrags = int(seqLen/size)
 			for i in range(1,numFrags+2):
 				fragSeq = seq[size*(i-1):fragmentLength*i]
-				fragsFile.write(ID+str(i)+'\n')
-				fragsFile.write(fraqSeq+'\n')
-		r ~/JuanCamilo/GaTech/USDA_Spinach/test.txt test.out 70 iagsFile.close()
+				fragsFile.write('>'+str(ID)+'-'+str(i)+'\n')
+				fragsFile.write(str(fragSeq)+'\n')
+	fragsFile.close()
 
 '''2.0 Align the genome segments to the protein databaseDownload the gneomes from NCBI'''
 #=======================2.1 Create fragments from the genome file========================
@@ -63,9 +64,31 @@ os.remove(alignName)
 
 '''3.0 Run myTaxa and select the regions to be removed'''
 #=====================3.1 Run MyTaxa=====================
-os.syystem(args.my_taxa+"/MyTaxa "+myTaxaName+" "+outName+" 70") 
+os.syystem(args.my_taxa+"/MyTaxa "+myTaxaName+" "+outName+" 5") 
 
 '''4.0 Remove the regions selected from the original genome'''
+#============4.1 Check the values for each region=============
+with open(outName) as myTaxaFile:
+	lines = myTaxaFile.readlines()
+	for line in lines:
+		if line.startswith('<'):
+			continue
+		else:
+			fields = line.split('\t')
+			if fields[2]=='NA':
+				vals.append('NaN'
+			vals.append(fields[2])
+#=======4.2 Select the bottom 5 pecentile and remove it=======
+valsDist = np.array(vals)
+removeVals = np.percentile(valsDist,5)
+with open(outName) as myTaxaFile:
+	lines = myTaxaFIle.readlines()
+	for line in lines:
+		if line.startswith('<'):
+			continue
+		else:
+			fields = line.split('\t')
+			region = fields[0]
 
 
 
