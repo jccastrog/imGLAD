@@ -374,7 +374,7 @@ try:
 except:
 	iniTheta = np.ones(shape=(m, n+1))
 	iniTheta[:, 1:n+1] = X
-	theta=decorated_cost(it, y, n)i
+	theta=decorated_cost(it, y, n)
 
 	theta = [-631.5,70164.7]
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
