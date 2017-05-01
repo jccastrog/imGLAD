@@ -36,6 +36,7 @@ fragsName = 'fragments.fa'
 alignName = 'myTaxaAlign.tbl'
 myTaxaName = 'myTaxaIn.txt'
 outName = 'myTaxaOut.txt'
+regNameFile = 'regions.txt'
 vals = []
 path = os.path.dirname(os.path.realpath(__file__))
 #=======================1.3 Define functions=========================
@@ -52,6 +53,12 @@ def genome_fragments(genomeFile,size,outFile):
 				fragsFile.write('>'+str(ID)+'-'+str(i)+'\n')
 				fragsFile.write(str(fragSeq)+'\n')
 	fragsFile.close()
+def remove_regions(genomeFile,regionsFile,outFile):
+	updatedGenome = open(outFile,'w')
+	with open(genomeFile) as fastaFile:
+		for fastaParse in SeqIO.parse(fastaFile:
+				ID
+
 
 '''2.0 Align the genome segments to the protein databaseDownload the gneomes from NCBI'''
 #=======================2.1 Create fragments from the genome file========================
@@ -80,7 +87,8 @@ with open(outName) as myTaxaFile:
 			vals.append(fields[2])
 #=======4.2 Select the bottom 5 pecentile and remove it=======
 valsDist = np.array(vals)
-removeVals = np.percentile(valsDist,5)
+removeTh = np.percentile(valsDist,5)
+regFile = open(regName,'w')
 with open(outName) as myTaxaFile:
 	lines = myTaxaFIle.readlines()
 	for line in lines:
@@ -89,6 +97,11 @@ with open(outName) as myTaxaFile:
 		else:
 			fields = line.split('\t')
 			region = fields[0]
+			value = fields[2]
+			if value<=removeTh:
+				write.regFile(region)
 
+refFile.close()
 
-
+with open(args.target) as fastaFile:
+	
