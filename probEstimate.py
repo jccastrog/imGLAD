@@ -92,7 +92,6 @@ for file in args.map:
 						else:
 							genPos[key]=1
 	#2.3.2 Calculate sequencing depth and breadth====================
-	print wholeDepth
 	seqDepth = wholeDepth/float(genomeSize)
 	seqBreadth = sum(genPos.values())/float(genomeSize)
 	'''3.0 Calculate the probability of presence'''
