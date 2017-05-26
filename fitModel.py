@@ -138,8 +138,8 @@ sys.stderr.write('Downloading the training genomes from NCBI...\n')
 genomesFile = open('_tempdir/genomes.fna', 'w')
 #2.2.1 Download the list genomes========
 if args.genomes is not None:
-	if args.train_size is not None:
-		sys.stderr.write('ERROR! Argument -s ignored when using -l\n')
+	args.train_size = 1
+	sys.stderr.write('Warning! Argument -s ignored when using -l\n')
 	genomes = [line.rstrip('\n') for line in open(args.genomes)]
 	with open(summFile) as summary:
 		lines = summary.readlines()
@@ -356,10 +356,10 @@ it[:, 1:n+1] = X
 try:
 	logit = sm.Logit(y, it)
 	theta = logit.fit().params
-except:
-	iniTheta = np.ones(shape=(m, n+1))
-	iniTheta[:, 1:n+1] = X
-	theta=decorated_cost(it, y, n)
+#except:
+#	iniTheta = np.ones(shape=(m, n+1))
+#	iniTheta[:, 1:n+1] = X
+#	theta=decorated_cost(it, y, n)
 except:
 	sys.stderr.write('ERROR! Perfect separation found. Couldnt opimize the regression parameters.\n')
 	sys.stderr.wrtie('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
@@ -371,11 +371,13 @@ it[:, n-1] = X[:,0]
 try:
 	logit = sm.Logit(y, it)
 	theta = logit.fit().params
+#except:
+#	iniTheta = np.ones(shape=(m, n+1))
+#	iniTheta[:, 1:n+1] = X
+#	theta=decorated_cost(it, y, n)
 except:
-	iniTheta = np.ones(shape=(m, n+1))
-	iniTheta[:, 1:n+1] = X
-	theta=decorated_cost(it, y, n)
-
+	sys.stderr.write('ERROR! Perfect separation found. Couldnt opimize the regression parameters.\n')
+	sys.stderr.wrtie('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
 	theta = [-631.5,70164.7]
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
