@@ -11,13 +11,16 @@ please type "./fitModel.py -h" for usage help
 
 '''1.0 Import modules, define functions, and initialize variables'''
 #========================1.1 Import modules=========================
-import os, sys, subprocess 
-import argparse 
-import gzip 
-import random 
-import scipy.optimize as opt 
-import numpy as np 
-from numpy import loadtxt, where 
+try :
+	import os, sys, subprocess
+	import argparse
+	import gzip
+	import random
+	import scipy.optimize as opt
+	import numpy as np
+	from numpy import loadtxt, where 
+except:
+	sys.stderr.write('ERROR! Cannot import required modules remember fitModel.py requires os, sys, subprocess, argparse, gzip, random, scipy, and numpy.\n')
 try :
 	from Bio import SeqIO
 	from Bio.Seq import Seq
@@ -33,7 +36,7 @@ except:
 try:
 	import statsmodels.discrete.discrete_model as sm
 except:
-	sys.stderr.write('WARNING! Consider installing python module "statsmodels" for faster calculation of model parameters \n')
+	sys.stderr.write('ERROR! Module "statsmodels" is missing please install it before running fitModel.py\n')
 #=====================1.2 Initialize variables======================
 #1.2.1 Parser variables=============================================
 parser = argparse.ArgumentParser(description="fitModel: Using simulated metagenomes built with ART estimate the training parameters for detection in a metagenomic dataset [jccastrog@gatech.edu]")
@@ -362,7 +365,7 @@ try:
 #	theta=decorated_cost(it, y, n)
 except:
 	sys.stderr.write('ERROR! Perfect separation found. Couldnt opimize the regression parameters.\n')
-	sys.stderr.wrtie('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
+	sys.stderr.write('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
 	theta = [-34.738273,550.229,1080.350]
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2])+"\n")
 #6.3.2 Calculate based on sequencing breadth and depth======================
