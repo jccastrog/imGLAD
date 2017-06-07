@@ -339,6 +339,7 @@ for filename in os.listdir("_tempaln/"):
 	trainFile.write(trainStr)
 trainFile.close()
 os.system("rm -rf _tempaln")
+os.system("rm -rf _tempdir")
 
 '''6.0 Determine the logistic model parameters based on the training data'''
 sys.stderr.write('Training the logistic model...\n')
