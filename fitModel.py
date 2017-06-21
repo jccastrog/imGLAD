@@ -381,7 +381,7 @@ try:
 #	theta=decorated_cost(it, y, n)
 except:
 	sys.stderr.write('ERROR! Perfect separation found. Couldnt opimize the regression parameters.\n')
-	sys.stderr.wrtie('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
+	sys.stderr.write('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
 	theta = [-631.5,70164.7]
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()

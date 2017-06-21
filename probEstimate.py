@@ -11,10 +11,14 @@ please type "./protEstimate.py -h" for usage help
 
 '''1.0 Import modules, define functions, and initialize variables'''
 #========================1.1 Import modules=========================
-import os, sys, argparse, subprocess, re  #interact with the system, use regular expressions
-from os.path import basename
-import numpy as np #make calculations base
-from Bio import SeqIO #parse and manipulate fasta files
+try:
+	import os, sys, argparse #interact with the system, use regular expressions
+	from os.path import basename
+	import numpy as np #make calculations base
+	from Bio import SeqIO #parse and manipulate fasta files
+	from scipy import stats
+except:
+	sys.stderr.write('ERROR! Cannot import required modules remember probEstimate.py requires os, sys, argparse, numpy, scipy, and Bio')
 
 #=====================1.2 Initialize variables======================
 parser = argparse.ArgumentParser(description="protEstimate.py: Estimation of bacterial genomes in biological samples [jccastrog@gatech.edu]")
@@ -64,7 +68,8 @@ with open(args.param) as paramFile:
 #2.1.3 Parse mapping=====================================================
 print 'File'+'\t'+'Depth'+'\t'+'Breadth'+'\t'+'p-Value'
 for file in args.map:
-	genPos = dict() 
+	genPos = dict()
+	depthPos = np.zeros(genomeSize)
 	wholeDepth = 0 
 	with open(file) as map:
 		lines = map.readlines()
@@ -81,18 +86,23 @@ for file in args.map:
 					keys = range(subSta,subEnd+1)
 					for key in keys:
 						if key in genPos:
+							depthPos[key]+=1
 							continue
 						else:
 							genPos[key]=1
+							depthPos[key]+=1
 				else :
 					keys = range(subEnd,subSta+1)
 					for key in keys:
 						if key in genPos:
+							depthPos[key]+=1
 							continue
 						else:
 							genPos[key]=1
+							depthPos[key]+=1
 	#2.3.2 Calculate sequencing depth and breadth====================
 	seqDepth = wholeDepth/float(genomeSize)
+	seqDepth = stats.trim_mean(depthPos,0.025)
 	seqBreadth = sum(genPos.values())/float(genomeSize)
 	'''3.0 Calculate the probability of presence'''
 	if args.mode=='single':
