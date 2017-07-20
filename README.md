@@ -9,11 +9,11 @@ The software consists of two parts the first part creates a series of metagenomi
 
 ##System requirements
 
-Python 2.7 or higher.
+Python 2.7 or higher [https://www.python.org/download/releases/2.7/](https://www.python.org/download/releases/2.7/).
 
-ART 2.5.8 or higher.
+ART 2.5.8 or higher [https://www.niehs.nih.gov/research/resources/software/biostatistics/art/](https://www.niehs.nih.gov/research/resources/software/biostatistics/art/).
 
-Either BLAST 2.2.28 (or higher) or BLAT (any version)
+Either BLAST 2.2.28 (or higher) [https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download](https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) or BLAT (any version) [http://hgdownload.soe.ucsc.edu/downloads.html#source_downloads] (http://hgdownload.soe.ucsc.edu/downloads.html#source_downloads).
 
 ###Python requirements
 
@@ -27,7 +27,7 @@ Clone the git repository
    $> git clone https://github.com/jccastrog/imGLAD
    ```
 
-You can also download the zip file from the GitHub site [https://github.com/jccastrog/imGLAD](https://github.com/jccastrog/imGLAD)
+You can also download the zip file from the GitHub site [https://github.com/jccastrog/imGLAD](https://github.com/jccastrog/imGLAD).
 
 ## Building models for target genomes
 
