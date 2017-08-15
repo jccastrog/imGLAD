@@ -182,11 +182,11 @@ else:
 				line = line.rstrip('\n')
                 	        fields = line.split('\t')
 	                        ftpName = fields[2].split('/')[-1]
-        	                ftpName = fields[2]+'/'+ftpName+'_genomic.fna.gz'
+				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[2],ftpName)
 				spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
 					break
-				elif str(spRef[0])==str(spTarget[0]):
+				elif str(spRef[0])==str(spTarget[0]) or fields[5]==str(spTarget[0]):
 					continue
 				else :
 					outName = "_".join(fields[1].split(' '))+".fna.gz"
@@ -215,7 +215,8 @@ else:
                                 line = line.rstrip('\n')
                                 fields = line.split('\t')
                                 ftpName = fields[2].split('/')[-1]
-                                ftpName = fields[2]+'/'+ftpName+'_genomic.fna.gz'
+				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[2],ftpName)
+#                                ftpName = fields[2]+'/'+ftpName+'_genomic.fna.gz'
                                 spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
                                         break
@@ -249,8 +250,7 @@ else:
                 os.remove("_tempdir/assembly_summary_complete_genomes.txt")
                 refFile.close()
 genomesFile.close()
-sys.stderr.write('Download finished a list of the genomes used can be found in "'+refName+'"...\n')
-### Compare the genomes to the ANI DB ###
+sys.stderr.write('Download finished a list of the genomes used can be found in "{0}"...\n'.format(refName))
 
 '''3.0 Create training datasets from random reads'''
 sys.stderr.write('Constructing the training datasets...\n')
@@ -259,7 +259,9 @@ sys.stderr.write('Constructing the training datasets...\n')
 if str(args.platform) == 'illumina':
 	for i in range(1,int(args.training_examples)+1):
 		numSeqs = int(int(args.num_reads)/int(args.train_size))
-		os.system("art_"+str(args.platform)+" -ss MSv3 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
+		os.system("art_{0} -ss MSv3 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-{1} -c {2} -l {3} > /dev/null".format(str(args.platform),str(i),str(numSeqs),str(args.read_length)))
+#		os.system("art_"+str(args.platform)+" -ss MSv3 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
+#		"_tempdie/simulatedNeg-{0}"
 		os.remove("_tempdir/simulatedNeg-"+str(i)+".aln")
 	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
