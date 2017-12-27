@@ -158,7 +158,7 @@ if args.genomes is not None:
 				refFile.write(os.path.basename(outName)+'\n')
 				subprocess.call(["curl", fileName, "-o", outName, "--silent"])
 				fastaName = outName.rstrip('.gz')
-				zipRef = zip.open(outName, 'rb')
+				zipRef = gzip.open(outName, 'rb')
 				fastaFile = open(fastaName, 'wb')
 				fastaFile.write( zipRef.read() )
 				zipRef.close()
@@ -168,8 +168,8 @@ if args.genomes is not None:
 					for line in inFile:
 				                genomesFile.write(line)
 				os.remove(fastaName)
-			os.remove("_tempdir/assembly_summary_complete_genomes.txt")
 		refFile.close()
+	os.remove("_tempdir/assembly_summary_complete_genomes.txt")
 #2.2.2 Download the default genomes=====
 else:
 	with open(summFile) as summary:
