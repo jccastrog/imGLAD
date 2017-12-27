@@ -134,7 +134,7 @@ def decorated_cost(it, y, n):
 if not os.path.exists("_tempdir"):
 	os.makedirs("_tempdir") 
 os.system("curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/assembly_summary.txt -o _tempdir/genomes.txt --silent")
-os.system("awk -F '\t' -v OFS='\t' '{if($12==\"Complete Genome\") print $1, $8, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt")
+os.system("awk -F '\t' -v OFS='\t' '{if($12==\"Complete Genome\") print $1, $8, $7, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt")
 os.remove('_tempdir/genomes.txt')
 summFile='_tempdir/assembly_summary_complete_genomes.txt'
 #=======2.2 Download the genomes========
@@ -182,12 +182,12 @@ else:
 	                for line in lines:
 				line = line.rstrip('\n')
                 	        fields = line.split('\t')
-	                        ftpName = fields[2].split('/')[-1]
+	                        ftpName = fields[3].split('/')[-1]
 				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[2],ftpName)
 				spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
 					break
-				elif str(spRef[0])==str(spTarget[0]) or fields[6]==str(spTarget[0]):
+				elif str(spRef[0])==str(spTarget[0]) or fields[2]==str(spTarget[0]):
 					continue
 				else :
 					outName = "_".join(fields[1].split(' '))+".fna.gz"
