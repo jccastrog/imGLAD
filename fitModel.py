@@ -183,7 +183,7 @@ else:
 				line = line.rstrip('\n')
                 	        fields = line.split('\t')
 	                        ftpName = fields[3].split('/')[-1]
-				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[2],ftpName)
+				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
 				spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
 					break
@@ -215,8 +215,8 @@ else:
 			for line in lines:
                                 line = line.rstrip('\n')
                                 fields = line.split('\t')
-                                ftpName = fields[2].split('/')[-1]
-				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[2],ftpName)
+                                ftpName = fields[3].split('/')[-1]
+				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
 #                                ftpName = fields[2]+'/'+ftpName+'_genomic.fna.gz'
                                 spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
