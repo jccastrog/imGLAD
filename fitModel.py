@@ -37,6 +37,7 @@ try:
 	import statsmodels.discrete.discrete_model as sm
 except:
 	sys.stderr.write('ERROR! Module "statsmodels" is missing please install it before running fitModel.py\n')
+	sys.exit()
 #=====================1.2 Initialize variables======================
 #1.2.1 Parser variables=============================================
 parser = argparse.ArgumentParser(description="fitModel: Using simulated metagenomes built with ART estimate the training parameters for detection in a metagenomic dataset [jccastrog@gatech.edu]")
@@ -186,7 +187,7 @@ else:
 				spRef = fields[1].split(' ')
 				if genoCount==int(args.train_size):
 					break
-				elif str(spRef[0])==str(spTarget[0]) or fields[5]==str(spTarget[0]):
+				elif str(spRef[0])==str(spTarget[0]) or fields[6]==str(spTarget[0]):
 					continue
 				else :
 					outName = "_".join(fields[1].split(' '))+".fna.gz"
@@ -316,7 +317,7 @@ elif args.prog=="blat":
 		for filename in os.listdir("_tempdir/"):
 			if filename.endswith(".fa"):
 				os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
-#		os.system("rm -rf _tempdir")
+		os.system("rm -rf _tempdir")
 	except:
 		sys.stderr.write('ERROR! Could not find "blat" make sure the Blat binaries are added to your $PATH!\n')
 		os.system("rm -rf _tempaln _tempdir")
@@ -393,5 +394,5 @@ sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
 detLimit = (2.944439 - theta[0])/theta[1]
 detFile = open(detName, 'w')
 detFile.write('Thanks for using imGLAD\n')
-detFile.write('The detection limit for your '+args.sp+' genome is: '+str(detLimit)+' in terms of sequencing breadth of the genome. This means you need to sample at least '++str(detLimit*100)+' of the genome in order to detect it.') 
+detFile.write('The detection limit for your {} genome is: {} in terms of sequencing breadth of the genome. This means you need to sample at least {}% of the genome in order to detect it.'.format(args.target,detLimit,detLimit*100))
 #===========================================================================
