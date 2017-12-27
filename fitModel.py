@@ -152,8 +152,8 @@ if args.genomes is not None:
 			line = line.rstrip('\n')
 			fields = line.split('\t')
 			if fields[0] in genomes:
-				fileName = fields[2].split('/')[-1]
-				fileName = fields[2]+'/'+fileName+'_genomic.fna.gz'
+				fileName = fields[3].split('/')[-1]
+				fileName = fields[3]+'/'+fileName+'_genomic.fna.gz'
 				outName = "_tempdir/"+"_".join(fields[1].split(' '))+".fna.gz"
 				refFile.write(os.path.basename(outName)+'\n')
 				subprocess.call(["curl", fileName, "-o", outName, "--silent"])
