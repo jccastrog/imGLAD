@@ -21,7 +21,8 @@ try :
 	from numpy import loadtxt, where 
 except:
 	sys.stderr.write('ERROR! Cannot import required modules remember fitModel.py requires os, sys, subprocess, argparse, gzip, random, scipy, and numpy.\n')
-try :
+  sys.exit()
+try : 
 	from Bio import SeqIO
 	from Bio.Seq import Seq
 	from Bio.Blast.Applications import NcbiblastxCommandline
