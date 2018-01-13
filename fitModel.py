@@ -149,7 +149,7 @@ if args.genomes is not None:
 	genomes = [line.rstrip('\n') for line in open(args.genomes)]
 	with open(summFile) as summary:
 		lines = summary.readlines()
-		refFile = open(refName, 'w')
+		refFile = open(refName, 'wb')
 		for line in lines:
 			line = line.rstrip('\n')
 			fields = line.split('\t')
@@ -158,7 +158,6 @@ if args.genomes is not None:
 				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
 				outName = "_".join(fields[1].split(' '))+".fna.gz"
 				writeName = outName.rstrip('.fna.gz')
-				print(outName)
 				outName = outName.replace("(","")
 				outName = outName.replace(")","")
 				outName = outName.replace(":","")
@@ -176,7 +175,7 @@ if args.genomes is not None:
 					for line in inFile:
 						genomesFile.write(line)
 				os.remove(fastaName)
-	refFile.close()
+		refFile.close()
         os.remove("_tempdir/assembly_summary_complete_genomes.txt")
 #2.2.2 Download the default genomes=====
 else:
