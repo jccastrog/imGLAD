@@ -20,8 +20,8 @@ try :
 	import numpy as np
 	from numpy import loadtxt, where 
 except:
-	sys.stderr.write('ERROR! Cannot import required modules remember fitModel.py requires os, sys, subprocess, argparse, gzip, random, scipy, and numpy.\n')
-  sys.exit()
+    sys.stderr.write('ERROR! Cannot import required modules remember fitModel.py requires os, sys, subprocess, argparse, gzip, random, scipy, and numpy.\n')
+    sys.exit()
 try : 
 	from Bio import SeqIO
 	from Bio.Seq import Seq
@@ -153,24 +153,30 @@ if args.genomes is not None:
 			line = line.rstrip('\n')
 			fields = line.split('\t')
 			if fields[0] in genomes:
-				fileName = fields[3].split('/')[-1]
-				fileName = fields[3]+'/'+fileName+'_genomic.fna.gz'
-				outName = "_tempdir/"+"_".join(fields[1].split(' '))+".fna.gz"
-				refFile.write(os.path.basename(outName)+'\n')
-				subprocess.call(["curl", fileName, "-o", outName, "--silent"])
-				fastaName = outName.rstrip('.gz')
-				zipRef = gzip.open(outName, 'rb')
-				fastaFile = open(fastaName, 'wb')
-				fastaFile.write( zipRef.read() )
-				zipRef.close()
-				fastaFile.close()
-				os.remove(outName)
-				with open(outName.rstrip('.gz')) as inFile:
-					for line in inFile:
-				                genomesFile.write(line)
-				os.remove(fastaName)
-		refFile.close()
-	os.remove("_tempdir/assembly_summary_complete_genomes.txt")
+				ftpName = fields[3].split('/')[-1]
+				ftpName = fields[3]+'/'+ftpName+'_genomic.fna.gz'
+                print(ftpName)
+                outName = "_".join(fields[1].split(' '))+".fna.gz"
+                outName = outName.replace("(","")
+                outName = outName.replace(")","")
+                outName = outName.replace(":","")
+                outName = outName.replace("/","_")
+                outName = outName.replace("'","")
+                refFile.write(os.path.basename(outName)+'\n')
+                print(ftpName)
+                subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
+                fastaName = outName.rstrip('.gz')
+                zipRef = gzip.open(outName, 'rb')
+                fastaFile = open(fastaName, 'wb')
+                fastaFile.write( zipRef.read() )
+                zipRef.close()
+                os.remove(outName)
+                with open(outName.rstrip('.gz')) as inFile:
+                    for line in inFile:
+                        genomesFile.write(line)
+                os.remove(fastaName)
+        refFile.close()
+        os.remove("_tempdir/assembly_summary_complete_genomes.txt")
 #2.2.2 Download the default genomes=====
 else:
 	with open(summFile) as summary:
@@ -179,78 +185,78 @@ else:
 		refFile = open(refName, 'w')
 		spTarget = args.sp.split(' ')
 		genoCount = 0
-		if len(spTarget)==1:
-	                for line in lines:
-				line = line.rstrip('\n')
-                	        fields = line.split('\t')
-	                        ftpName = fields[3].split('/')[-1]
-				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
-				spRef = fields[1].split(' ')
-				if genoCount==int(args.train_size):
-					break
-				elif str(spRef[0])==str(spTarget[0]) or fields[2]==str(spTarget[0]):
-					continue
-				else :
-					outName = "_".join(fields[1].split(' '))+".fna.gz"
-		                        outName = outName.replace("(","")
-	        	                outName = outName.replace(")","")
-	                	        outName = outName.replace(":","")
-		                        outName = outName.replace("/","_")
-		                        outName = outName.replace("'","")
-		                        outName = "_tempdir/"+outName
-		                        refFile.write(os.path.basename(outName)+'\n')
-		                        subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
-		                        fastaName = outName.rstrip('.gz')
-		                        zipRef = gzip.open(outName, 'rb')
-		                        fastaFile = open(fastaName, 'wb')
-		                        fastaFile.write( zipRef.read() )
-		                        zipRef.close()
-		                        fastaFile.close()
-		                        os.remove(outName)
-	        	                with open(fastaName) as inFile:
-		                                for line in inFile:
-		                                        genomesFile.write(line)
-		                        os.remove(outName.rstrip('.gz'))
-					genoCount+=1
-		elif len(spTarget)==2:
-			for line in lines:
-                                line = line.rstrip('\n')
-                                fields = line.split('\t')
-                                ftpName = fields[3].split('/')[-1]
-				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
-#                                ftpName = fields[2]+'/'+ftpName+'_genomic.fna.gz'
-                                spRef = fields[1].split(' ')
-				if genoCount==int(args.train_size):
-                                        break
-                                elif spRef[0]==spTarget[0] and spRef[1]==spTarget[1]:
-                                        continue
-                                else :
-                                        outName = "_".join(fields[1].split(' '))+".fna.gz"
-                                        outName = outName.replace("(","")
-                                        outName = outName.replace(")","")
-                                        outName = outName.replace(":","")
-                                        outName = outName.replace("/","_")
-                                        outName = outName.replace("'","")
-                                        outName = "_tempdir/"+outName
-                                        refFile.write(os.path.basename(outName)+'\n')
-                                        subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
-                                        fastaName = outName.rstrip('.gz')
-                                        zipRef = gzip.open(outName, 'rb')
-                                        fastaFile = open(fastaName, 'wb')
-                                        fastaFile.write( zipRef.read() ) 
-                                        zipRef.close()
-                                        fastaFile.close()
-                                        os.remove(outName)
-                                        with open(fastaName) as inFile:
-                                                for line in inFile:
-                                                        genomesFile.write(line)
-                                        os.remove(outName.rstrip('.gz'))
-					genoCount+=1
-		else:
-			sys.stderr.write('ERROR! Invalid species name')
-			sys.exit()
-                os.remove("_tempdir/assembly_summary_complete_genomes.txt")
-                refFile.close()
+        print('asd')
+        if len(spTarget)==1:
+            for line in lines:
+                line = line.rstrip('\n')
+                fields = line.split('\t')
+                ftpName = fields[3].split('/')[-1]
+                ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
+                spRef = fields[1].split(' ')
+                if genoCount==int(args.train_size):
+                    break
+                elif str(spRef[0])==str(spTarget[0]) or fields[2]==str(spTarget[0]):
+                    continue
+                else:
+                    outName = "_".join(fields[1].split(' '))+".fna.gz"
+                    outName = outName.replace("(","")
+                    outName = outName.replace(")","")
+                    outName = outName.replace(":","")
+                    outName = outName.replace("/","_")
+                    outName = outName.replace("'","")
+                    outName = "_tempdir/"+outName
+                    refFile.write(os.path.basename(outName)+'\n')
+                    subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
+                    fastaName = outName.rstrip('.gz')
+                    zipRef = gzip.open(outName, 'rb')
+                    fastaFile = open(fastaName, 'wb')
+                    fastaFile.write( zipRef.read() )
+                    zipRef.close()
+                    fastaFile.close()
+                    os.remove(outName)
+                    with open(fastaName) as inFile:
+                        for line in inFile:
+                            genomesFile.write(line)
+                            os.remove(outName.rstrip('.gz'))
+                            genoCount+=1
+        elif len(spTarget)==2:
+            for line in lines:
+                line = line.rstrup('\n')
+                fields = line.split('\t')
+                ftpName = fields[3].split('/')[-1]
+                ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
+                spRef = fields[1].split(' ')
+                if genoCount==int(args.train_size):
+                    break
+                elif spRef[0]==spTarget[0] and spRef[1]==spTarget[1]:
+                    continue
+                else :
+                    outName = "_".join(fields[1].split(' '))+".fna.gz"
+                    outName = outName.replace("(","")
+                    outName = outName.replace(")","")
+                    outName = outName.replace(":","")
+                    outName = outName.replace("/","_")
+                    outName = outName.replace("'","")
+                    outName = "_tempdir/"+outName
+                    refFile.write(os.path.basename(outName)+'\n')
+                    subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
+                    fastaName = outName.rstrip('.gz')
+                    zipRef = gzip.open(outName, 'rb')
+                    fastaFile = open(fastaName, 'wb')
+                    fastaFile.write( zipRef.read() )
+                    zipRef.close()
+                    fastaFile.close()
+                    os.remove(outName)
+                    with open(fastaName) as inFile:
+                        for line in inFile:
+                            genomesFile.write(line)
+                    os.remove(outName.rstrip('.gz'))
+                genoCount+=1
+        else:
+            sys.stderr.write('ERROR! Invalid species name')
+            sys.exit()
+            os.remove("_tempdir/assembly_summary_complete_genomes.txt")
+            refFile.close()
 genomesFile.close()
 sys.stderr.write('Download finished a list of the genomes used can be found in "{0}"...\n'.format(refName))
 
@@ -369,7 +375,7 @@ try:
 #	iniTheta[:, 1:n+1] = X
 #	theta=decorated_cost(it, y, n)
 except:
-	sys.stderr.write('ERROR! Perfect separation found. Couldnt opimize the regression parameters.\n')
+	sys.stderr.write('Warning! Perfect separation found. Couldnt opimize the regression parameters.\n')
 	sys.stderr.write('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
 	theta = [-34.738273,550.229,1080.350]
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2])+"\n")
