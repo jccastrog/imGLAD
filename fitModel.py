@@ -8,7 +8,6 @@
 please type "./fitModel.py -h" for usage help
 '''
 
-
 '''1.0 Import modules, define functions, and initialize variables'''
 #========================1.1 Import modules=========================
 try :
@@ -63,6 +62,7 @@ trainName = 'trainingValues.csv'
 refName = 'trainingGenomes.txt'
 paramName = 'parameters.txt'
 detName = 'detectionLimit.txt'
+FNULL = open(os.devnull, 'w')
 #=======================1.3 Define functions=========================
 def fastq_to_fasta(fastqFile,fastaFile):
 	fasta = open(fastaFile,'w')
@@ -129,18 +129,33 @@ def decorated_cost(it, y, n):
         return compute_grad(theta, it, y, n)
     theta = np.zeros(n)
     return opt.fmin_bfgs(f, theta, fprime, disp=True, maxiter=400)
+def file_proc(infile, outfile):
+	out = open(outfile, 'w')
+	with open(infile) as file:
+		lines = file.readlines()
+		for line in lines:
+			line = line.rstrip('\n')
+			if line.startswith("#"):
+				continue
+			fields = line.split("\t")
+			accNum = fields[0]
+			spName = fields[7]
+			taxid = fields[6]
+			url = fields[19]
+			outLine = "{}\t{}\t{}\t{}\n".format(accNum, spName, taxid, url)
+			out.write(outLine)
+	out.close()
+	os.remove(infile)
 
 '''2.0 Download the gneomes from NCBI'''
 #======2.1 Initialize the download======
 if not os.path.exists("_tempdir"):
 	os.makedirs("_tempdir") 
-os.system("curl ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/assembly_summary.txt -o _tempdir/genomes.txt --silent")
-#os.system("awk -F '\t' -v OFS='\t' '{if($12==\"Complete Genome\") print $1, $8, $7, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt")
-os.system("awk -F '\t' -v OFS='\t' '{print $1, $8, $7, $20}' _tempdir/genomes.txt > _tempdir/assembly_summary_complete_genomes.txt")
-os.remove('_tempdir/genomes.txt')
+subprocess.call(["curl", "ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/assembly_summary.txt", "-o", "_tempdir/genomes.txt", "--silent"])
+file_proc("_tempdir/genomes.txt", "_tempdir/assembly_summary_complete_genomes.txt")
 summFile='_tempdir/assembly_summary_complete_genomes.txt'
 #=======2.2 Download the genomes========
-sys.stderr.write('Downloading the training genomes from NCBI...\n')
+sys.stderr.write('Downloading the training genomes from NCBI...\n')`
 genomesFile = open('_tempdir/genomes.fna', 'w')
 #2.2.1 Download the list genomes========
 if args.genomes is not None:
@@ -198,13 +213,14 @@ else:
 					continue
 				else:
 					outName = "_".join(fields[1].split(' '))+".fna.gz"
+					writeName = outName.rstrip('.fna.gz')
 					outName = outName.replace("(","")
 					outName = outName.replace(")","")
 					outName = outName.replace(":","")
 					outName = outName.replace("/","_")
 					outName = outName.replace("'","")
 					outName = "_tempdir/"+outName
-					refFile.write(os.path.basename(outName)+'\n')
+					refFile.write(writeName+'\n')
 					subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
 					fastaName = outName.rstrip('.gz')
 					zipRef = gzip.open(outName, 'rb')
@@ -230,15 +246,15 @@ else:
 				elif spRef[0]==spTarget[0] and spRef[1]==spTarget[1]:
 					continue
 				else :
-
 					outName = "_".join(fields[1].split(' '))+".fna.gz"
+					writeName = outName.rstrip('.fna.gz')
 					outName = outName.replace("(","")
 					outName = outName.replace(")","")
 					outName = outName.replace(":","")
 					outName = outName.replace("/","_")
 					outName = outName.replace("'","")
 					outName = "_tempdir/"+outName
-					refFile.write(os.path.basename(outName)+'\n')
+					refFile.write(writeName+'\n')
 					subprocess.call(["curl", ftpName, "-o", outName, "--silent"])
 					fastaName = outName.rstrip('.gz')
 					zipRef = gzip.open(outName, 'rb')
@@ -267,14 +283,12 @@ sys.stderr.write('Constructing the training datasets...\n')
 if str(args.platform) == 'illumina':
 	for i in range(1,int(args.training_examples)+1):
 		numSeqs = int(int(args.num_reads)/int(args.train_size))
-		os.system("art_{0} -ss MSv3 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-{1} -c {2} -l {3} > /dev/null".format(str(args.platform),str(i),str(numSeqs),str(args.read_length)))
-#		os.system("art_"+str(args.platform)+" -ss MSv3 -i _tempdir/genomes.fna -o _tempdir/simulatedNeg-"+str(i)+" -c "+str(numSeqs)+" -l "+str(args.read_length)+" > /dev/null")
-#		"_tempdie/simulatedNeg-{0}"
+		subprocess.call(["art_"+args.platform, "-ss", "MSv3", "-i", "_tempdir/genomes.fna", "-o", "_tempdir/simulatedNeg-"+str(i), "-c", str(numSeqs), "-l", str(args.read_length)], stdout=FNULL, stderr=FNULL)
 		os.remove("_tempdir/simulatedNeg-"+str(i)+".aln")
 	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
 	for i in range(1,int(args.training_examples)+1):
-		os.system("art_illumina -ss MSv3 -i "+str(args.target)+" -o _tempdir/simulatedTarget-"+str(i)+" -f "+str(random.uniform(0.005,0.05))+" -l "+str(args.read_length)+" > /dev/null")
+		subprocess.call(["art_illumina". "-ss", "MSv3", "-i", str(args.target), "-o", "_tempdir/simulatedTarget-"+str(i), "-f", str(random.uniform(0.005,0.1)), "-l", str(args.read_length)]stdout=FNULL, stderr=FNULL)
 		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln")
 	#3.1.3 Spike the negative datasets with varying amounts of the target genome
 		destFile = "_tempdir/simulatedPos-"+str(i)+".fq"
@@ -307,31 +321,31 @@ if args.prog=="blastn":
 	if not os.path.exists('_tempdb'):
 		os.makedirs('_tempdb')
 	try:
-		os.system("makeblastdb -in "+args.target+" -input_type fasta -dbtype nucl -out _tempdb/targetDB > /dev/null")
+		subprocess.call(["makeblastdb", "-in", args.target, "-input_type", "fasta", "-dbtype", "nucl", "-out", "_tempdb/targetDB"], stdout=FNULL, stderr=FNULL)
 		#======4.2 Align the reads of the datasets to the target=======
 		sys.stderr.write('Recruiting reads to the target...\n')
 		for filename in os.listdir("_tempdir/"):
 			if filename.endswith(".fa"):
 				blastCMD = NcbiblastxCommandline(cmd='blastn', outfmt=6, query="_tempdir/"+filename, db='_tempdb/targetDB', evalue=0.1, out="_tempaln/"+os.path.splitext(filename)[0]+".tbl")
 				blastCMD()
-		os.system("rm -rf _tempdb _tempdir")
+		subprocess.call(["rm", "-rf", "_tempdb", "_tempdir"])
 	except:
 		sys.stderr.write('ERROR! Could not find "makeblastdb" or "blastn", make sure than the blast binaries are added to your $PATH!\n')
-		os.system("rm -rf _tempdb _tempaln _tempdir")
+		subprocess.call(["rm", "-rf", "_tempdb", "_tempdir", "_tempdir"], stdout=FNULL, stderr=FNULL)
 		sys.exit()
 elif args.prog=="blat":
 	try:
 		for filename in os.listdir("_tempdir/"):
 			if filename.endswith(".fa"):
-				os.system("blat "+args.target+" _tempdir/"+filename+" _tempaln/"+os.path.splitext(filename)[0]+".tbl -t=dna -out=blast8 > /dev/null")
-		os.system("rm -rf _tempdir")
+				subprocess.call(["blat", args.target, "_tempdir/"+filename, "_tempaln/"+os.path.splitext(filename)[0]+".tbl", "-t=dna", "-out=blast8"], stdout=FNULL, stderr=FNULL)
+		subprocess.call(["rm", "-rf", "_tempdir"])
 	except:
 		sys.stderr.write('ERROR! Could not find "blat" make sure the Blat binaries are added to your $PATH!\n')
-		os.system("rm -rf _tempaln _tempdir")
+		subprocess.call(["rm", "-rf", "_tempaln", "_tempdir"])
 		sys.exit()
 else:
 	sys.stderr.write('Invalid option -p '+str(args.prog)+' use either blat or blastn')
-	os.system("rm -rf _tempaln _tempdir")
+	subprocess.call(["rm", "-rf", "_tempaln", "_tempdir"])
 	sys.exit()
 
 '''5.0 Calculate the sequencing depth and breadth of the training datasetets'''
@@ -348,8 +362,7 @@ for filename in os.listdir("_tempaln/"):
 	trainStr = str(trainArr[0])+","+str(trainArr[1])+","+str(trainArr[2])+"\n"
 	trainFile.write(trainStr)
 trainFile.close()
-os.system("rm -rf _tempaln")
-os.system("rm -rf _tempdir")
+subprocess.call(["rm", "-rf", "_tempaln", "_tempdir"])
 
 '''6.0 Determine the logistic model parameters based on the training data'''
 sys.stderr.write('Training the logistic model...\n')
@@ -395,7 +408,7 @@ except:
 	theta = [-631.5,70164.7]
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
-os.system("rm "+str(trainName))
+subprocess.call(["rm", str(trainName)])
 sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
 #=====================6.4 Establish the detection limit=====================
 detLimit = (2.944439 - theta[0])/theta[1]
