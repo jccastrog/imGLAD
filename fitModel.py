@@ -155,7 +155,7 @@ subprocess.call(["curl", "ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/bacteria/as
 file_proc("_tempdir/genomes.txt", "_tempdir/assembly_summary_complete_genomes.txt")
 summFile='_tempdir/assembly_summary_complete_genomes.txt'
 #=======2.2 Download the genomes========
-sys.stderr.write('Downloading the training genomes from NCBI...\n')`
+sys.stderr.write('Downloading the training genomes from NCBI...\n')
 genomesFile = open('_tempdir/genomes.fna', 'w')
 #2.2.1 Download the list genomes========
 if args.genomes is not None:
@@ -236,7 +236,7 @@ else:
 							genoCount+=1
 		elif len(spTarget)==2:
 			for line in lines:
-				line = line.rstrup('\n')
+				line = line.rstrip('\n')
 				fields = line.split('\t')
 				ftpName = fields[3].split('/')[-1]
 				ftpName = '{0}/{1}_genomic.fna.gz'.format(fields[3],ftpName)
@@ -288,7 +288,7 @@ if str(args.platform) == 'illumina':
 	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
 	for i in range(1,int(args.training_examples)+1):
-		subprocess.call(["art_illumina". "-ss", "MSv3", "-i", str(args.target), "-o", "_tempdir/simulatedTarget-"+str(i), "-f", str(random.uniform(0.005,0.1)), "-l", str(args.read_length)]stdout=FNULL, stderr=FNULL)
+		subprocess.call(["art_illumina", "-ss", "MSv3", "-i", str(args.target), "-o", "_tempdir/simulatedTarget-"+str(i), "-f", str(random.uniform(0.005,0.1)), "-l", str(args.read_length)], stdout=FNULL, stderr=FNULL)
 		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln")
 	#3.1.3 Spike the negative datasets with varying amounts of the target genome
 		destFile = "_tempdir/simulatedPos-"+str(i)+".fq"
