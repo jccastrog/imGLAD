@@ -288,7 +288,7 @@ if str(args.platform) == 'illumina':
 	os.remove("_tempdir/genomes.fna")
 	#3.1.2 Generate reads from the target genome at varying coverage
 	for i in range(1,int(args.training_examples)+1):
-		subprocess.call(["art_illumina", "-ss", "MSv3", "-i", str(args.target), "-o", "_tempdir/simulatedTarget-"+str(i), "-f", str(random.uniform(0.005,0.1)), "-l", str(args.read_length)], stdout=FNULL, stderr=FNULL)
+		subprocess.call(["art_illumina", "-ss", "MSv3", "-i", str(args.target), "-o", "_tempdir/simulatedTarget-"+str(i), "-f", str(random.uniform(0.005,0.05)), "-l", str(args.read_length)], stdout=FNULL, stderr=FNULL)
 		os.remove("_tempdir/simulatedTarget-"+str(i)+".aln")
 	#3.1.3 Spike the negative datasets with varying amounts of the target genome
 		destFile = "_tempdir/simulatedPos-"+str(i)+".fq"
