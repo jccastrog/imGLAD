@@ -2,8 +2,8 @@
 '''
 @name: fitModel.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 15-Mar-2017
-@version: 1.0.4
+@update: 13-May-2018
+@version: 1.1.0
 @license: GNU General Public License v3.0.
 please type "./fitModel.py -h" for usage help
 '''
