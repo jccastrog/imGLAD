@@ -166,6 +166,7 @@ if args.genomes is not None:
 		lines = summary.readlines()
 		refFile = open(refName, 'wb')
 		for line in lines:
+			args.train_size += 1
 			line = line.rstrip('\n')
 			fields = line.split('\t')
 			if fields[0] in genomes:
@@ -377,7 +378,7 @@ m, n = X.shape
 y.shape = (m, 1)
 #=======================6.3 Calculate the parameters========================
 paramFile = open(paramName, 'w')
-#6.3.1 Calculate based on sequencing breadth only===========================
+#6.3.1 Calculate based on sequencing depth and breadth===========================
 it = np.ones(shape=(m, n+1))
 it[:, 1:n+1] = X
 try:
@@ -392,7 +393,7 @@ except:
 	sys.stderr.write('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
 	theta = [-34.738273,550.229,1080.350]
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2])+"\n")
-#6.3.2 Calculate based on sequencing breadth and depth======================
+#6.3.2 Calculate based on sequencing breadth only======================
 it = np.ones(shape=(m, n))
 it[:, n-1] = X[:,0]
 try:
@@ -409,7 +410,7 @@ except:
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
 subprocess.call(["rm", str(trainName)])
-sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
+sys.stderr.write('Saved parameters can be found in parameters.txt\n')
 #=====================6.4 Establish the detection limit=====================
 detLimit = (2.944439 - theta[0])/theta[1]
 detFile = open(detName, 'w')
