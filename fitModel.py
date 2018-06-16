@@ -159,7 +159,7 @@ sys.stderr.write('Downloading the training genomes from NCBI...\n')
 genomesFile = open('_tempdir/genomes.fna', 'w')
 #2.2.1 Download the list genomes========
 if args.genomes is not None:
-	args.train_size = 1
+	args.train_size = 0
 	sys.stderr.write('Warning! Argument -s ignored when using -l\n')
 	genomes = [line.rstrip('\n') for line in open(args.genomes)]
 	with open(summFile) as summary:
