@@ -54,7 +54,7 @@ group.add_argument('-d', action='store', dest='read_length', required=False, def
 group = parser.add_argument_group('Mapping arguments') 
 group.add_argument('-p', action='store', dest='prog', required=False, default='blat', choices=["blat","blastn"], help='Program to be used to align the metagenomes and the reference sequence. (default: %(default)s)')
 group.add_argument('-i', action='store', dest='perc_identity', required=False, default='95', help='Percentage of identity to recruit a read to the genome. (default: %(default)s)')
-group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='100', help='Alingment length to recruit a read to the genome. (default: %(default)s)')
+group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='135', help='Alignment length to recruit a read to the genome. (default: %(default)s)')
 args = parser.parse_args() 
 #1.2.2 Global variables==============================================
 downloadDict=dict()
@@ -267,8 +267,8 @@ else:
 					with open(fastaName) as inFile:
 						for line in inFile:
 							genomesFile.write(line)
-							os.remove(outName.rstrip('.gz'))
-							genoCount+=1
+						os.remove(outName.rstrip('.gz'))
+						genoCount+=1
 		else:
 			sys.stderr.write('ERROR! Invalid species name')
 			sys.exit()
