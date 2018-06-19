@@ -189,7 +189,13 @@ if args.genomes is not None:
 				os.remove(outName)
 				with open(outName.rstrip('.gz')) as inFile:
 					for line in inFile:
-						genomesFile.write(line)
+						if lineTracker == 1:
+								genomesFile.write(line)
+								lineTracker += 1
+						elif line[0] != '>':
+							genomesFile.write(line)
+						else:
+							continue
 				os.remove(fastaName)
 		refFile.close()
         # os.remove("_tempdir/assembly_summary_complete_genomes.txt")
