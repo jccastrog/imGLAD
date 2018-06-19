@@ -192,7 +192,7 @@ if args.genomes is not None:
 						genomesFile.write(line)
 				os.remove(fastaName)
 		refFile.close()
-        os.remove("_tempdir/assembly_summary_complete_genomes.txt")
+        # os.remove("_tempdir/assembly_summary_complete_genomes.txt")
 #2.2.2 Download the default genomes=====
 else:
 	with open(summFile) as summary:
@@ -231,10 +231,17 @@ else:
 					fastaFile.close()
 					os.remove(outName)
 					with open(fastaName) as inFile:
+						lineTracker = 1
 						for line in inFile:
-							genomesFile.write(line)
-							os.remove(outName.rstrip('.gz'))
-							genoCount+=1
+							if lineTracker == 1:
+								genomesFile.write(line)
+								lineTracker += 1
+							elif line[0] != '>':
+								genomesFile.write(line)
+							else:
+								continue
+					os.remove(outName.rstrip('.gz'))
+					genoCount+=1
 		elif len(spTarget)==2:
 			for line in lines:
 				line = line.rstrip('\n')
@@ -265,10 +272,17 @@ else:
 					fastaFile.close()
 					os.remove(outName)
 					with open(fastaName) as inFile:
+						lineTracker = 1
 						for line in inFile:
-							genomesFile.write(line)
-						os.remove(outName.rstrip('.gz'))
-						genoCount+=1
+							if lineTracker == 1:
+								genomesFile.write(line)
+								lineTracker += 1
+							elif line[0] != '>':
+								genomesFile.write(line)
+							else:
+								continue
+					os.remove(outName.rstrip('.gz'))
+					genoCount+=1
 		else:
 			sys.stderr.write('ERROR! Invalid species name')
 			sys.exit()
