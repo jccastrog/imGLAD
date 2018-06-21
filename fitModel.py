@@ -54,7 +54,7 @@ group.add_argument('-d', action='store', dest='read_length', required=False, def
 group = parser.add_argument_group('Mapping arguments') 
 group.add_argument('-p', action='store', dest='prog', required=False, default='blat', choices=["blat","blastn"], help='Program to be used to align the metagenomes and the reference sequence. (default: %(default)s)')
 group.add_argument('-i', action='store', dest='perc_identity', required=False, default='95', help='Percentage of identity to recruit a read to the genome. (default: %(default)s)')
-group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='100', help='Alingment length to recruit a read to the genome. (default: %(default)s)')
+group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='135', help='Alignment length to recruit a read to the genome. (default: %(default)s)')
 args = parser.parse_args() 
 #1.2.2 Global variables==============================================
 downloadDict=dict()
@@ -159,13 +159,14 @@ sys.stderr.write('Downloading the training genomes from NCBI...\n')
 genomesFile = open('_tempdir/genomes.fna', 'w')
 #2.2.1 Download the list genomes========
 if args.genomes is not None:
-	args.train_size = 1
+	args.train_size = 0
 	sys.stderr.write('Warning! Argument -s ignored when using -l\n')
 	genomes = [line.rstrip('\n') for line in open(args.genomes)]
 	with open(summFile) as summary:
 		lines = summary.readlines()
 		refFile = open(refName, 'wb')
 		for line in lines:
+			args.train_size += 1
 			line = line.rstrip('\n')
 			fields = line.split('\t')
 			if fields[0] in genomes:
@@ -188,10 +189,16 @@ if args.genomes is not None:
 				os.remove(outName)
 				with open(outName.rstrip('.gz')) as inFile:
 					for line in inFile:
-						genomesFile.write(line)
+						if lineTracker == 1:
+								genomesFile.write(line)
+								lineTracker += 1
+						elif line[0] != '>':
+							genomesFile.write(line)
+						else:
+							continue
 				os.remove(fastaName)
 		refFile.close()
-        os.remove("_tempdir/assembly_summary_complete_genomes.txt")
+        # os.remove("_tempdir/assembly_summary_complete_genomes.txt")
 #2.2.2 Download the default genomes=====
 else:
 	with open(summFile) as summary:
@@ -230,10 +237,17 @@ else:
 					fastaFile.close()
 					os.remove(outName)
 					with open(fastaName) as inFile:
+						lineTracker = 1
 						for line in inFile:
-							genomesFile.write(line)
-							os.remove(outName.rstrip('.gz'))
-							genoCount+=1
+							if lineTracker == 1:
+								genomesFile.write(line)
+								lineTracker += 1
+							elif line[0] != '>':
+								genomesFile.write(line)
+							else:
+								continue
+					os.remove(outName.rstrip('.gz'))
+					genoCount+=1
 		elif len(spTarget)==2:
 			for line in lines:
 				line = line.rstrip('\n')
@@ -264,10 +278,17 @@ else:
 					fastaFile.close()
 					os.remove(outName)
 					with open(fastaName) as inFile:
+						lineTracker = 1
 						for line in inFile:
-							genomesFile.write(line)
-							os.remove(outName.rstrip('.gz'))
-							genoCount+=1
+							if lineTracker == 1:
+								genomesFile.write(line)
+								lineTracker += 1
+							elif line[0] != '>':
+								genomesFile.write(line)
+							else:
+								continue
+					os.remove(outName.rstrip('.gz'))
+					genoCount+=1
 		else:
 			sys.stderr.write('ERROR! Invalid species name')
 			sys.exit()
@@ -377,7 +398,7 @@ m, n = X.shape
 y.shape = (m, 1)
 #=======================6.3 Calculate the parameters========================
 paramFile = open(paramName, 'w')
-#6.3.1 Calculate based on sequencing breadth only===========================
+#6.3.1 Calculate based on sequencing depth and breadth===========================
 it = np.ones(shape=(m, n+1))
 it[:, 1:n+1] = X
 try:
@@ -392,7 +413,7 @@ except:
 	sys.stderr.write('       Target genome is too different from training genomes, to avoid errors consider training with another set\n')
 	theta = [-34.738273,550.229,1080.350]
 paramFile.write(str(theta[0])+","+str(theta[1])+","+str(theta[2])+"\n")
-#6.3.2 Calculate based on sequencing breadth and depth======================
+#6.3.2 Calculate based on sequencing breadth only======================
 it = np.ones(shape=(m, n))
 it[:, n-1] = X[:,0]
 try:
@@ -409,7 +430,7 @@ except:
 paramFile.write(str(theta[0])+","+str(theta[1])+"\n")
 paramFile.close()
 subprocess.call(["rm", str(trainName)])
-sys.stderr.write('Saved paremeters can be found in parameters.txt\n')
+sys.stderr.write('Saved parameters can be found in parameters.txt\n')
 #=====================6.4 Establish the detection limit=====================
 detLimit = (2.944439 - theta[0])/theta[1]
 detFile = open(detName, 'w')
