@@ -29,7 +29,7 @@ group.add_argument('-p', action='store', dest='param', required=True,help="Param
 group = parser.add_argument_group('Optional arguments') #Required
 group.add_argument('-l', action='store', dest='mode', required=False, default='single', choices=["single","general"],help='Number of parameters to be used to estimate the prescence probability: single mode will use only sequencing breadth whereas general mode will use sequencing depth and sequencing breadth. (default : %(default)s)')
 group.add_argument('-i', action='store', dest='perc_identity', required=False, default='95', help='Percentage of identity to recruit a read to the genome. (default: %(default)s)')
-group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='100', help='Alingment length to recruit a read to the genome. (default: %(default)s)')
+group.add_argument('-a', action= 'store', dest='aln_length', required=False, default='135', help='Alignment length to recruit a read to the genome. (default: %(default)s)')
 args = parser.parse_args()
 genomeSize = 0
 thetaB = []
