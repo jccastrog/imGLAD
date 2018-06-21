@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
 @name: fitModel.py
-@author: Juan C. Castro <jccastrog at gatech dot edu>
+@author: Juan C. Castro <jccastrog at gatech dot edu> & William T. Harvey <wharvey31@gatech.edu>
 @update: 13-May-2018
 @version: 1.1.0
 @license: GNU General Public License v3.0.
