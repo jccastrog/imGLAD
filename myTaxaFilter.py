@@ -2,8 +2,8 @@
 '''
 @name: myTaxaFilter.py
 @author: Juan C. Castro <jccastrog at gatech dot edu>
-@update: 31-Mar-2017
-@version: 1.0.0
+@update: 21-Juan-2017
+@version: 1.0.2
 @license: GNU General Public License v3.0.
 please type "./myTaxaFilter.py -h" for usage help
 '''

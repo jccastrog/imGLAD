@@ -3,8 +3,8 @@
 '''
 @name: probEstimate.py
 @author: Juan C. Castro <jccastrog at gatech dot edu> & William T. Harvey <wharvey31@gatech.edu>
-@update: 09-Mar-2017
-@version: 1.0.4
+@update: 21-Jun-2017
+@version: 1.0.8
 @license: GNU General Public License v3.0.
 please type "./protEstimate.py -h" for usage help
 '''
