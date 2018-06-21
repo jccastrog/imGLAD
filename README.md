@@ -7,7 +7,7 @@ imGLAD is a computational tool for detection of bacterial genomes in metagenomic
 
 The software consists of two parts the first part creates a series of metagenomic datasets, the datasets are created in such a way that the target organism is present in half of them and absent in the other half.
 
-##System requirements
+## System requirements
 
 Python 2.7 or higher [https://www.python.org/download/releases/2.7/](https://www.python.org/download/releases/2.7/).
 
@@ -15,7 +15,7 @@ ART 2.5.8 or higher [https://www.niehs.nih.gov/research/resources/software/biost
 
 Either BLAST 2.2.28 (or higher) [https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download](https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=Download) or BLAT (any version) [http://hgdownload.soe.ucsc.edu/downloads.html#source_downloads] (http://hgdownload.soe.ucsc.edu/downloads.html#source_downloads).
 
-###Python requirements
+### Python requirements
 
 numpy, scipy, biopython, gzip, screed, statsmodel (optional)
 
