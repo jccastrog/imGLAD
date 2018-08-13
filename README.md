@@ -9,7 +9,7 @@ The software consists of two parts the first part creates a series of metagenomi
 
 ## System requirements
 
-Python 2.7 or higher [https://www.python.org/download/releases/2.7/](https://www.python.org/download/releases/2.7/).
+Python 3.4 [https://www.python.org/downloads/release/python-370/](https://www.python.org/downloads/release/python-370/)
 
 ART 2.5.8 or higher [https://www.niehs.nih.gov/research/resources/software/biostatistics/art/](https://www.niehs.nih.gov/research/resources/software/biostatistics/art/).
 
@@ -17,7 +17,7 @@ Either BLAST 2.2.28 (or higher) [https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=We
 
 ### Python requirements
 
-numpy, scipy, biopython, gzip, screed, statsmodel (optional)
+numpy, scipy, biopython, gzip, screed, statsmodels (requires cython installation if using python older than 3.4)
 
 ## Installation
 

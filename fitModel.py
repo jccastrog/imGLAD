@@ -83,11 +83,11 @@ def breadth_depth(genomeSize,mappingFile,reqIden,reqLength):
 	with open(mappingFile) as mapping:
 		lines = mapping.readlines()
 		for line in lines:
-			line.rstrip('\n') 
-                        fields = line.split('\t')
-                        alnLength = int(fields[3])
-                        perIden = float(fields[2])
-                        if alnLength>=reqLength and perIden>=reqIden:
+			line.rstrip('\n')
+			fields = line.split('\t')
+			alnLength = int(fields[3])
+			perIden = float(fields[2])
+			if alnLength>=reqLength and perIden>=reqIden:
 				subSta = int(fields[8])
 				subEnd = int(fields[9])
 				wholeDepth = wholeDepth+alnLength
