@@ -37,8 +37,8 @@ thetaBD = []
 
 #=======================1.3 Define functions========================
 def predProb(X,theta):
-	X = np.array(X)
-	theta = np.array(theta)
+	X = np.array(tuple(X))
+	theta = np.array(tuple(theta))
 	z = np.dot(X,theta)
 	g = 1/(1 + np.exp(-z))
 	return(g)
@@ -51,7 +51,7 @@ with open(args.target) as fastaFile:
 		ID = fastaParse.id
                 seq = fastaParse.seq
 		genomeSize = genomeSize+len(seq)
-	
+
 #2.1.2 Parse parameters===================================================
 with open(args.param) as paramFile:
 	lines = paramFile.readlines()
@@ -83,7 +83,7 @@ for file in args.map:
 				subEnd = int(fields[9])
 				wholeDepth = wholeDepth + alnLength
 				if subSta < subEnd:
-					keys = range(subSta,subEnd+1)
+					keys = range(subSta-1,subEnd)
 					for key in keys:
 						if key in genPos:
 							depthPos[key]+=1
@@ -91,8 +91,8 @@ for file in args.map:
 						else:
 							genPos[key]=1
 							depthPos[key]+=1
-				else :
-					keys = range(subEnd,subSta+1)
+				else:
+					keys = range(subEnd-1,subSta)
 					for key in keys:
 						if key in genPos:
 							depthPos[key]+=1
