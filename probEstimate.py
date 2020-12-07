@@ -49,7 +49,7 @@ def predProb(X,theta):
 with open(args.target) as fastaFile:
 	for fastaParse in SeqIO.parse(fastaFile,"fasta"):
 		ID = fastaParse.id
-                seq = fastaParse.seq
+		seq = fastaParse.seq
 		genomeSize = genomeSize+len(seq)
 
 #2.1.2 Parse parameters===================================================
@@ -66,7 +66,7 @@ with open(args.param) as paramFile:
 			for field in fields:
 				thetaBD.append(float(field))
 #2.1.3 Parse mapping=====================================================
-print 'File'+'\t'+'Depth'+'\t'+'Breadth'+'\t'+'p-Value'
+print('File'+'\t'+'Depth'+'\t'+'Breadth'+'\t'+'p-Value')
 for file in args.map:
 	genPos = dict()
 	depthPos = np.zeros(genomeSize)
@@ -111,5 +111,5 @@ for file in args.map:
 	else:
 		X = [1,seqBreadth,seqDepth]
 		predict=predProb(X,thetaBD)
-	print basename(file)+'\t'+str(seqDepth)+'\t'+str(seqBreadth)+'\t'+str(1-predict)
+	print(basename(file)+'\t'+str(seqDepth)+'\t'+str(seqBreadth)+'\t'+str(1-predict))
 #======================================================================================
